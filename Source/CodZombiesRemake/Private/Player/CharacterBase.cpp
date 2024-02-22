@@ -80,8 +80,10 @@ void ACharacterBase::BeginPlay()
 
 	if (HasAuthority())
 	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
 
-		CurrentWeapon = GetWorld()->SpawnActor<AWeaponBase>(StartingWeaponClass);
+		CurrentWeapon = GetWorld()->SpawnActor<AWeaponBase>(StartingWeaponClass, SpawnParams);
 		if (CurrentWeapon)
 		{
 
@@ -100,6 +102,7 @@ void ACharacterBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ACharacterBase, CurrentWeapon);
+	DOREPLIFETIME(ACharacterBase, Points);
 }
 
 
@@ -107,6 +110,7 @@ void ACharacterBase::OnRep_AttachWeapon()
 {
 	if (CurrentWeapon)
 	{
+
 		if (IsLocallyControlled())
 		{
 
@@ -116,12 +120,13 @@ void ACharacterBase::OnRep_AttachWeapon()
 		else
 		{
 
-			CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("s_weaponSocket"));
+			//CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("s_weaponSocket"));
 			UE_LOG(LogTemp, Warning, TEXT("SPAWNED AND ATTEMPTED TO ATTACH WEAPON TO MESH"));
 
 		}
 	}
 }
+
 
 
 // Called to bind functionality to input
@@ -185,6 +190,11 @@ void  ACharacterBase::SetHasRifle(bool bNewHasRifle)
 bool  ACharacterBase::GetHasRifle()
 {
 	return bHasRifle;
+}
+
+void ACharacterBase::OnRep_PointsChanged()
+{
+	OnPointsChanged.Broadcast(Points);
 }
 
 void ACharacterBase::Interact()
@@ -259,21 +269,30 @@ void ACharacterBase::SetInteractableObject()
 
 void ACharacterBase::IncrementPoints(uint16 Value)
 {
-	Points += Value;
-	OnPointsChanged.Broadcast(Points);
-	UE_LOG(LogTemp, Warning, TEXT("POINTS: %d"), Points);
+	if (HasAuthority())
+	{
+
+
+		Points += Value;
+		OnRep_PointsChanged();
+		UE_LOG(LogTemp, Warning, TEXT("POINTS: %d"), Points);
+	}
 }
 
 bool ACharacterBase::DecrementPoints(uint16 Value)
 {
-	if ((Points - Value) < 0)
-		return false;
-	else
-		Points -= Value;
+	if (HasAuthority())
+	{
+		if ((Points - Value) < 0)
+			return false;
+		else
+			Points -= Value;
 
-	OnPointsChanged.Broadcast(Points);
-	UE_LOG(LogTemp, Warning, TEXT("POINTS: %d"), Points);
-	return true;
+		OnRep_PointsChanged();
+		UE_LOG(LogTemp, Warning, TEXT("POINTS: %d"), Points);
+	}
+		return true;
+	
 }
 
 

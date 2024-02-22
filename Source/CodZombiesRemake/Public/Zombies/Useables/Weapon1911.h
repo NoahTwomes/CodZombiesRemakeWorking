@@ -16,6 +16,11 @@ class CODZOMBIESREMAKE_API AWeapon1911 : public AWeaponBase
 	
 public:
 	AWeapon1911();
+
+protected:
+	virtual void Server_Fire_Implementation(FVector MuzzleLocation, FRotator MuzzleRotation) override;
+
+public:
 	virtual  TArray<FHitResult> Fire(class ACharacterBase* ShootingPlayer) override;
 	virtual void Reload() override;
 

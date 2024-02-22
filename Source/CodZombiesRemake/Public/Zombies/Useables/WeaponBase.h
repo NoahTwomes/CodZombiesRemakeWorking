@@ -51,6 +51,12 @@ protected:
 	virtual void BeginPlay() override;
 
 	TArray<FHitResult> PerformLineTrace(class ACharacterBase* ShootingPlayer);
+	TArray<FHitResult> PerformLineTrace(FVector MuzzleLocation, FRotator MuzzleRotation);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_Fire(FVector MuzzleLocation, FRotator MuzzleRotation);
+	bool Server_Fire_Validate(FVector MuzzleLocation, FRotator MuzzleRotation);
+	virtual void Server_Fire_Implementation(FVector MuzzleLocation, FRotator MuzzleRotation);
 
 public:	
 	virtual TArray<FHitResult> Fire(class ACharacterBase* ShootingPlayer);

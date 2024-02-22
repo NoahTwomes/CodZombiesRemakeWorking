@@ -76,8 +76,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	float InteractionRange;
 
-	UPROPERTY(EditDefaultsOnly) //set to replicate MOVE TO PLAYER STATE WHEN CREATED
+	UPROPERTY(ReplicatedUsing = OnRep_PointsChanged, EditDefaultsOnly) //set to replicate MOVE TO PLAYER STATE WHEN CREATED
 	int32 Points;
+	UFUNCTION()
+	void OnRep_PointsChanged();
 
 protected:
 	void Interact();
