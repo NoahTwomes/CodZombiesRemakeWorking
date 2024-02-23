@@ -3,6 +3,7 @@
 
 #include "Zombies/ZombieBase.h"
 #include "Player/CharacterBase.h"
+#include "Player/ZombiesPlayerState.h"
 
 // Sets default values
 AZombieBase::AZombieBase()
@@ -21,9 +22,12 @@ void AZombieBase::BeginPlay()
 
 void AZombieBase::Hit(ACharacterBase* Player)
 {
-	if (HasAuthority() && Player)
+	if (Player)
 	{
-		Player->IncrementPoints(100);
+		if (AZombiesPlayerState* PState = Player->GetPlayerState<AZombiesPlayerState>())
+		{
+			PState->IncrementPoints(100);
+		}
 	}
 }
 

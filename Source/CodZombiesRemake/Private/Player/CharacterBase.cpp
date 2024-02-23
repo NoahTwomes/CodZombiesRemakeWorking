@@ -5,6 +5,7 @@
 #include "Zombies/ZombieBase.h"
 #include "Zombies/Useables/WeaponBase.h"
 
+
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -46,7 +47,7 @@ ACharacterBase::ACharacterBase()
 
 	Interactable = nullptr;
 	InteractionRange = 200.0f;
-	Points = 500;
+
 
 	WeaponIndex = 0;
 
@@ -102,9 +103,7 @@ void ACharacterBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ACharacterBase, CurrentWeapon);
-	DOREPLIFETIME(ACharacterBase, Points);
 }
-
 
 void ACharacterBase::OnRep_AttachWeapon()
 {
@@ -192,10 +191,7 @@ bool  ACharacterBase::GetHasRifle()
 	return bHasRifle;
 }
 
-void ACharacterBase::OnRep_PointsChanged()
-{
-	OnPointsChanged.Broadcast(Points);
-}
+
 
 void ACharacterBase::Interact()
 {
@@ -267,33 +263,6 @@ void ACharacterBase::SetInteractableObject()
 	}
 }
 
-void ACharacterBase::IncrementPoints(uint16 Value)
-{
-	if (HasAuthority())
-	{
-
-
-		Points += Value;
-		OnRep_PointsChanged();
-		UE_LOG(LogTemp, Warning, TEXT("POINTS: %d"), Points);
-	}
-}
-
-bool ACharacterBase::DecrementPoints(uint16 Value)
-{
-	if (HasAuthority())
-	{
-		if ((Points - Value) < 0)
-			return false;
-		else
-			Points -= Value;
-
-		OnRep_PointsChanged();
-		UE_LOG(LogTemp, Warning, TEXT("POINTS: %d"), Points);
-	}
-		return true;
-	
-}
 
 
 

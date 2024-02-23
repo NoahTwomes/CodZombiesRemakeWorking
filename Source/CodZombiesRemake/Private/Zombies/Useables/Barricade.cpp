@@ -3,6 +3,7 @@
 
 #include "Zombies/Useables/Barricade.h"
 #include "Player/CharacterBase.h"
+#include "Player/ZombiesPlayerState.h"
 
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -49,15 +50,21 @@ void ABarricade::OnRep_BarricadeUsed()
 
 void ABarricade::Use(ACharacterBase* Player)
 {
-	if (HasAuthority() && Player && Player->DecrementPoints(Cost))
+	if (HasAuthority() && Player && Player)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("IN USE FUNCTION FOR %s"), *GetName());
-		bIsUsed = true;
-		OnRep_BarricadeUsed();
-
-		if (AZombiesGameMode* GM = GetWorld()->GetAuthGameMode<AZombiesGameMode>())
+		if (AZombiesPlayerState* PState = Player->GetPlayerState<AZombiesPlayerState>())
 		{
-			GM->NewZoneActive(AccessZone);
+			if (!PState->DecrementPoints(Cost))
+				return;
+
+			UE_LOG(LogTemp, Warning, TEXT("IN USE FUNCTION FOR %s"), *GetName());
+			bIsUsed = true;
+			OnRep_BarricadeUsed();
+
+			if (AZombiesGameMode* GM = GetWorld()->GetAuthGameMode<AZombiesGameMode>())
+			{
+				GM->NewZoneActive(AccessZone);
+			}
 		}
 	}
 }

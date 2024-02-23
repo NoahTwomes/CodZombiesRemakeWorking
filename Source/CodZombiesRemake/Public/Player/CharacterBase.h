@@ -12,7 +12,7 @@ class UCameraComponent;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteractChanged, const FString&, OnInteractChanged);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPointsChanged, int32, OnPointsChanged);
+
 
 UCLASS()
 class CODZOMBIESREMAKE_API ACharacterBase : public ACharacter
@@ -67,8 +67,7 @@ protected:
 	UPROPERTY(BlueprintAssignable)
 	FInteractChanged OnInteractChanged;
 
-	UPROPERTY(BlueprintAssignable)
-	FPointsChanged OnPointsChanged;
+
 
 	FTimerHandle TInteractTimerHandle;
 	class AInteractableBase* Interactable;
@@ -76,10 +75,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	float InteractionRange;
 
-	UPROPERTY(ReplicatedUsing = OnRep_PointsChanged, EditDefaultsOnly) //set to replicate MOVE TO PLAYER STATE WHEN CREATED
-	int32 Points;
-	UFUNCTION()
-	void OnRep_PointsChanged();
+
 
 protected:
 	void Interact();
@@ -95,9 +91,7 @@ protected:
 
 	 virtual void OnAimingStart();
 	 virtual void OnAimingEnd();
-public:
-	void IncrementPoints(uint16 Value);
-	bool DecrementPoints(uint16 Value);
+
 
 
 protected:
