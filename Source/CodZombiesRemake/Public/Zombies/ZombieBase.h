@@ -16,10 +16,25 @@ public:
 	AZombieBase();
 
 protected:
+	int16 Health;
+
+	UPROPERTY(EditDefaultsOnly)
+	float CleanupDelay;
+	
+	UPROPERTY(ReplicatedUsing = OnRep_Die, EditAnywhere)
+	bool bIsDead;
+	UFUNCTION()
+	void OnRep_Die();
+	void OnCleanup();
+
+protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void DecrementHealth(int16 Damage);
+	void Die();
+	uint8 GetPointsForKill(FString BoneName);
 
 public:
-	void Hit(class ACharacterBase* Player);
+	void Hit(class ACharacterBase* Player, FHitResult HitResult);
 
 };

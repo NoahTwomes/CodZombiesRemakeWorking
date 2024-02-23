@@ -54,9 +54,9 @@ protected:
 	TArray<FHitResult> PerformLineTrace(FVector MuzzleLocation, FRotator MuzzleRotation);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_Fire(FVector MuzzleLocation, FRotator MuzzleRotation);
-	bool Server_Fire_Validate(FVector MuzzleLocation, FRotator MuzzleRotation);
-	virtual void Server_Fire_Implementation(FVector MuzzleLocation, FRotator MuzzleRotation);
+	void Server_Fire(const TArray<FHitResult>& HitResults);
+	bool Server_Fire_Validate(const TArray<FHitResult>& HitResults);
+	virtual void Server_Fire_Implementation(const TArray<FHitResult>& HitResults);
 
 public:	
 	virtual TArray<FHitResult> Fire(class ACharacterBase* ShootingPlayer);

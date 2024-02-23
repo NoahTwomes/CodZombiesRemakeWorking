@@ -18,7 +18,7 @@ public:
 	AWeapon1911();
 
 protected:
-	virtual void Server_Fire_Implementation(FVector MuzzleLocation, FRotator MuzzleRotation) override;
+	virtual void Server_Fire_Implementation(const TArray<FHitResult>& HitResults) override;
 
 public:
 	virtual  TArray<FHitResult> Fire(class ACharacterBase* ShootingPlayer) override;

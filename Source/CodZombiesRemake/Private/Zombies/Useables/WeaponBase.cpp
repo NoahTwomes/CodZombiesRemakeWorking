@@ -50,7 +50,7 @@ TArray<FHitResult> AWeaponBase::PerformLineTrace(ACharacterBase* ShootingPlayer)
 	FCollisionResponseParams CollisionResponse;
 
 	DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.0f, 0, 3.0f);
-	GetWorld()->LineTraceMultiByChannel(OUT HitResults, Start, End, ECollisionChannel::ECC_GameTraceChannel12, CollisionParams, CollisionResponse);
+	GetWorld()->LineTraceMultiByChannel(OUT HitResults, Start, End, ECollisionChannel::ECC_GameTraceChannel2, CollisionParams, CollisionResponse);
 	return HitResults;
 }
 
@@ -68,16 +68,16 @@ TArray<FHitResult> AWeaponBase::PerformLineTrace(FVector MuzzleLocation, FRotato
 	FCollisionResponseParams CollisionResponse;
 
 	DrawDebugLine(GetWorld(), MuzzleLocation, End, FColor::Red, false, 2.0f, 0, 3.0f);
-	GetWorld()->LineTraceMultiByChannel(OUT HitResults, MuzzleLocation, End, ECollisionChannel::ECC_GameTraceChannel12, CollisionParams, CollisionResponse);
+	GetWorld()->LineTraceMultiByChannel(OUT HitResults, MuzzleLocation, End, ECollisionChannel::ECC_GameTraceChannel2, CollisionParams, CollisionResponse);
 	return HitResults;
 }
 
-bool AWeaponBase::Server_Fire_Validate(FVector MuzzleLocation, FRotator MuzzleRotation)
+bool AWeaponBase::Server_Fire_Validate(const TArray<FHitResult>& HitResults)
 {
 	return true;
 }
 
-void AWeaponBase::Server_Fire_Implementation(FVector MuzzleLocation, FRotator MuzzleRotation)
+void AWeaponBase::Server_Fire_Implementation(const TArray<FHitResult>& HitResults)
 {
 
 }

@@ -22,7 +22,7 @@ AWeapon1911::AWeapon1911()
 	CurrentMagazineAmmo = MagazineMaxAmmo;
 }
 
-void AWeapon1911::Server_Fire_Implementation(FVector MuzzleLocation, FRotator MuzzleRotation)
+void AWeapon1911::Server_Fire_Implementation(const TArray<FHitResult>& HitResults)
 {
 	UE_LOG(LogTemp, Warning, TEXT("SERVER FIRE FUNTION"));
 
@@ -33,11 +33,9 @@ void AWeapon1911::Server_Fire_Implementation(FVector MuzzleLocation, FRotator Mu
 	}
 
 	
-
-		TArray<FHitResult> HitResults = PerformLineTrace(MuzzleLocation, MuzzleRotation);
 		if (HitResults.Num() > 0)
 		{
-			for (FHitResult& Result : HitResults)
+			for (FHitResult Result : HitResults)
 			{
 				if (AActor* HitActor = Result.GetActor())
 				{
@@ -45,7 +43,7 @@ void AWeapon1911::Server_Fire_Implementation(FVector MuzzleLocation, FRotator Mu
 					{
 						UE_LOG(LogTemp, Warning, TEXT("ZOMBIE HIT %s"), *Zombie->GetName());
 						if (ACharacterBase* Player = Cast<ACharacterBase>(GetOwner()))
-							Zombie->Hit(Player);
+							Zombie->Hit(Player, Result);
 					}
 
 
@@ -75,12 +73,15 @@ TArray<FHitResult> AWeapon1911::Fire(ACharacterBase* ShootingPlayer)
 		{
 			for (FHitResult& Result : HitResults)
 			{
+				FString HitBone = Result.BoneName.ToString();
+				UE_LOG(LogTemp, Warning, TEXT("Hit Bone: %s"), *HitBone);
+				
 				if (AActor* HitActor = Result.GetActor())
 				{
 					if (AZombieBase* Zombie = Cast<AZombieBase>(Result.GetActor()))
 					{
 						UE_LOG(LogTemp, Warning, TEXT("ZOMBIE HIT %s"), *Zombie->GetName());
-						Zombie->Hit(ShootingPlayer);
+						Zombie->Hit(ShootingPlayer, Result);
 					}
 
 
@@ -98,12 +99,14 @@ TArray<FHitResult> AWeapon1911::Fire(ACharacterBase* ShootingPlayer)
 		{
 			for (FHitResult& Result : HitResults)
 			{
+
+				
 				if (AActor* HitActor = Result.GetActor())
 				{
 					if (AZombieBase* Zombie = Cast<AZombieBase>(Result.GetActor()))
 					{
 						UE_LOG(LogTemp, Warning, TEXT("ZOMBIE HIT %s"), *Zombie->GetName());
-						Zombie->Hit(ShootingPlayer);
+						Zombie->Hit(ShootingPlayer, Result);
 					}
 
 
@@ -112,7 +115,7 @@ TArray<FHitResult> AWeapon1911::Fire(ACharacterBase* ShootingPlayer)
 			}
 
 		}
-		Server_Fire(WeaponMesh->GetSocketLocation(FName("muzzleSocket")), WeaponMesh->GetSocketRotation(FName("muzzleSocket")));
+		Server_Fire(HitResults);
 	}
 	return TArray<FHitResult>();
 
