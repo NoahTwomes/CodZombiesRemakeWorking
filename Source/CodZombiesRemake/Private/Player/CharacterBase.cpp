@@ -283,6 +283,10 @@ void ACharacterBase::OnFire()
 			{
 				UE_LOG(LogTemp, Warning, TEXT("PLAYING FIRE MONTAGE"));
 				AnimInstance->Montage_Play(FireMontage);
+				if (bIsAiming)
+					AnimInstance->Montage_JumpToSection(FName("FireADS"), FireMontage);
+				else
+					AnimInstance->Montage_JumpToSection(FName("FireHip"), FireMontage);
 			}
 		}
 

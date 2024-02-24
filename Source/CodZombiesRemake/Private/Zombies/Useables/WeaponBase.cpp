@@ -107,4 +107,9 @@ UAnimMontage* AWeaponBase::GetFireAnimMontage()
 	return FPSArmsFireMontage;
 }
 
+TEnumAsByte<EWeaponID> AWeaponBase::GetWeaponID()
+{
+	return WeaponID;
+}
+
 

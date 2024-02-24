@@ -38,6 +38,13 @@ public:
 	}
 };
 
+UENUM(BlueprintType)
+enum EWeaponID
+{
+	Colt1911 UMETA(DisplayName = "1911"),
+	M1Carbine UMETA(DisplayName = "M1Carbine")
+};
+
 UCLASS()
 class CODZOMBIESREMAKE_API AWeaponBase : public AActor
 {
@@ -50,6 +57,9 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
 	class USkeletalMeshComponent* WeaponMesh;
+
+	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
+	TEnumAsByte<EWeaponID> WeaponID;
 
 	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
 	class UAnimationAsset* FireAnimation;
@@ -101,5 +111,7 @@ public:
 
 	class UAnimMontage* GetFireAnimMontage();
 	
+	UFUNCTION(BlueprintCallable)
+	TEnumAsByte<EWeaponID> GetWeaponID();
 
 };
