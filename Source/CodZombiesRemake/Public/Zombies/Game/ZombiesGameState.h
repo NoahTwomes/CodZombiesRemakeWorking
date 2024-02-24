@@ -20,6 +20,7 @@ protected:
 	uint16 RoundNumber; //set to replicate
 	uint8 ZombiesOnMap; //Set to replicate
 	uint16 TotalZombiesRemaining; //Set to replicate
+	float ZombieHealth;
 
 public:
 	uint16 GetRoundNumber();
@@ -27,4 +28,7 @@ public:
 	void SetTotalZombiesRemaining(const uint16& ZombieCount);
 	uint16 GetTotalZombiesRemaining();
 	void ZombieKilled();
+	uint8 GetZombiesOnMap();
+	void ZombieSpawned();
+	float GetZombieHealth();
 };

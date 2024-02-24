@@ -60,6 +60,11 @@ bool ACharacterBase::GetIsAiming()
 	return bIsAiming;
 }
 
+AWeaponBase* ACharacterBase::GetCurrentWeapon()
+{
+	return CurrentWeapon;
+}
+
 
 // Called when the game starts or when spawned
 void ACharacterBase::BeginPlay()
@@ -254,12 +259,12 @@ void ACharacterBase::SetInteractableObject()
 	if (Temp)
 	{
 		Interactable = Temp;
-		UE_LOG(LogTemp, Warning, TEXT("HIT ACTOR %s"), *HitResult.GetActor()->GetName());
+		
 	}
 	else
 	{
 		Interactable = nullptr;
-		UE_LOG(LogTemp, Warning, TEXT("DID NOT HIT ANYTHIGN IMPORTANT"));
+	
 	}
 }
 

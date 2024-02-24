@@ -16,11 +16,12 @@ public:
 	AZombieBase();
 
 protected:
-	int16 Health;
+	UPROPERTY(Replicated)
+	float Health;
 
 	UPROPERTY(EditDefaultsOnly)
 	float CleanupDelay;
-	
+
 	UPROPERTY(ReplicatedUsing = OnRep_Die, EditAnywhere)
 	bool bIsDead;
 	UFUNCTION()
@@ -34,7 +35,7 @@ protected:
 	uint8 GetHitPart(FString BoneName);
 	void DecrementHealth(int16 Damage);
 	void Die();
-	uint8 GetPointsForHit(uint8 HitPart);
+	uint8 GetPointsForHit(uint8 HitPart, float Damage);
 
 public:
 	void Hit(class ACharacterBase* Player, FHitResult HitResult);

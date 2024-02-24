@@ -20,7 +20,6 @@ AWeaponBase::AWeaponBase()
 
 
 	WeaponName = "Default";
-	BaseDamage = 100;
 	WeaponMaxAmmo = 255;
 	MagazineMaxAmmo = 30;
  
@@ -85,6 +84,11 @@ void AWeaponBase::Server_Fire_Implementation(const TArray<FHitResult>& HitResult
 TArray<FHitResult> AWeaponBase::Fire(ACharacterBase* ShootingPlayer)
 {
 	return TArray<FHitResult>();
+}
+
+FWeaponDamage AWeaponBase::GetWeaponDamage()
+{
+	return WeaponDamage;
 }
 
 void AWeaponBase::Reload()

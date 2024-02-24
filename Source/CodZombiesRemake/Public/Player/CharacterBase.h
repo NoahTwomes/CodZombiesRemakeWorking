@@ -63,6 +63,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool GetIsAiming();
 
+	UFUNCTION(BlueprintCallable)
+	class AWeaponBase* GetCurrentWeapon();
+
 protected:
 	UPROPERTY(BlueprintAssignable)
 	FInteractChanged OnInteractChanged;

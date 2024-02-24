@@ -5,6 +5,9 @@
 #include "Player/CharacterBase.h"
 #include "Player/ZombiesPlayerState.h"
 #include "Zombies/Game/ZombiesGameMode.h"
+#include "Zombies/Game/ZombiesGameState.h"
+#include "Zombies/Useables/WeaponBase.h"
+
 
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -26,6 +29,18 @@ AZombieBase::AZombieBase()
 void AZombieBase::BeginPlay()
 {
 	Super::BeginPlay();
+	if (HasAuthority())
+	{
+
+
+		if (AZombiesGameState* GS = GetWorld()->GetGameState<AZombiesGameState>())
+		{
+			Health = GS->GetZombieHealth();
+
+
+			UE_LOG(LogTemp, Warning, TEXT("Zombie Health: %f"),Health);
+		}
+	}
 	
 }
 
@@ -35,6 +50,7 @@ void AZombieBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AZombieBase, bIsDead);
+	DOREPLIFETIME(AZombieBase, Health);
 }
 
 
@@ -117,23 +133,23 @@ uint8 AZombieBase::GetHitPart(FString BoneName)
 }
 
 
-uint8 AZombieBase::GetPointsForHit(uint8 HitPart)
+uint8 AZombieBase::GetPointsForHit(uint8 HitPart, float Damage)
 {
-	if (Health - 50 <= 0)
+	if (Health - Damage <= 0)
 	{
 		switch (HitPart)
 		{
-		case 1: {DecrementHealth(50); return 50; }
-		  case 2: {DecrementHealth(50); return 60; }
-		  case 3: {DecrementHealth(50); return 70;}
-		  case 4: {DecrementHealth(50); return 100; }
+		case 1: {DecrementHealth(Damage); return 50; }
+		  case 2: {DecrementHealth(Damage); return 60; }
+		  case 3: {DecrementHealth(Damage); return 70;}
+		  case 4: {DecrementHealth(Damage); return 100; }
 		  default: {return 0; }
 		}
 	}
 
 	else
 	{
-		DecrementHealth(50);
+		DecrementHealth(Damage);
 		return 10;
 	}
 
@@ -151,12 +167,28 @@ void AZombieBase::Hit(ACharacterBase* Player,FHitResult HitResult)
 					return;
 				if (uint8 HitPart = GetHitPart(BoneName))
 				{
-					if (uint8 PointsForHit = GetPointsForHit(HitPart))
+					if (AWeaponBase* PlayerWeapon = Player->GetCurrentWeapon())
 					{
-					
-						PState->IncrementPoints(PointsForHit);
+
+
+						EHitLocation HitLocation = EHitLocation::None;
+							switch (HitPart)
+							{
+							case 2: HitLocation = EHitLocation::Torso; break;
+							case 3: HitLocation = EHitLocation::Head; break;
+							case 4: HitLocation = EHitLocation::Head;  break;
+
+							}
+							float WeaponDamage = PlayerWeapon->GetWeaponDamage().GetDamage(HitLocation);
+							UE_LOG(LogTemp, Warning, TEXT("WeaponDamgage: %f"), WeaponDamage);
+
+						if (uint8 PointsForHit = GetPointsForHit(HitPart, WeaponDamage))
+						{
+
+							PState->IncrementPoints(PointsForHit);
+						}
+
 					}
-					
 				}
 			
 		}
