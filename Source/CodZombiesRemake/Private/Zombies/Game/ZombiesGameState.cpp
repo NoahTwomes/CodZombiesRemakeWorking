@@ -7,6 +7,7 @@ AZombiesGameState::AZombiesGameState()
 {
 	RoundNumber = 1;
 	ZombiesOnMap = 0;
+	TotalZombiesRemaining = 5;
 }
 
 uint16 AZombiesGameState::GetRoundNumber()
@@ -17,4 +18,21 @@ uint16 AZombiesGameState::GetRoundNumber()
 void AZombiesGameState::IncrementRoundNumber()
 {
 	++RoundNumber;
+}
+
+void AZombiesGameState::SetTotalZombiesRemaining(const uint16& ZombieCount)
+{
+	TotalZombiesRemaining = ZombieCount;
+}
+
+uint16 AZombiesGameState::GetTotalZombiesRemaining()
+{
+	return TotalZombiesRemaining;
+}
+
+void AZombiesGameState::ZombieKilled()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ZOMBIE HAS BEEN KILLED"));
+
+	--TotalZombiesRemaining;
 }

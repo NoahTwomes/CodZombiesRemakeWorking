@@ -4,6 +4,7 @@
 #include "Zombies/ZombieBase.h"
 #include "Player/CharacterBase.h"
 #include "Player/ZombiesPlayerState.h"
+#include "Zombies/Game/ZombiesGameMode.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -28,6 +29,7 @@ void AZombieBase::BeginPlay()
 	
 }
 
+
 void AZombieBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -51,9 +53,10 @@ void AZombieBase::DecrementHealth(int16 Damage)
 
 void AZombieBase::OnRep_Die()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ONREP_DIE"));
+
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetMesh()->SetCollisionResponseToChannel(ECC_EngineTraceChannel2, ECR_Ignore);
 	GetMesh()->SetSimulatePhysics(true);
 	if (HasAuthority())
 	{
@@ -75,36 +78,65 @@ void AZombieBase::Die()
 {
 	if (HasAuthority())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Zombie Died"));
+	
+		//get game mode and decrementation
+		if (AZombiesGameMode* GM = GetWorld()->GetAuthGameMode<AZombiesGameMode>())
+		{
+			GM->ZombieKilled();
+		}
 		bIsDead = true;
 		OnRep_Die();
 	}
 }
 
-uint8 AZombieBase::GetPointsForKill(FString BoneName)
+uint8 AZombieBase::GetHitPart(FString BoneName)
 {
 	if (BoneName.Contains(FString("l")) || BoneName.Contains(FString("r")))
 	{ //limbHit
+
 		
-		DecrementHealth(30);
-		return 50;
+		return 1;
 	}
 	else if (BoneName.Contains(FString("spine")) || BoneName.Contains(FString("pelvis")))
 	{ //torsoHit
-		DecrementHealth(50);
-		return 60;
+		
+		return 2;
 	}
 	else if (BoneName.Equals(FString("neck_01")))
-	{
-		DecrementHealth(70);
-		return 70;
+	{ //Neck Hit
+		
+		return 3;
 	}
 	else if (BoneName.Equals(FString("head")))
-	{
-		DecrementHealth(90);
-		return 100;
+	{ //Head hit
+		
+		return 4;
 	}
+	//Nothing hit
 	return 0;
+}
+
+
+uint8 AZombieBase::GetPointsForHit(uint8 HitPart)
+{
+	if (Health - 50 <= 0)
+	{
+		switch (HitPart)
+		{
+		case 1: {DecrementHealth(50); return 50; }
+		  case 2: {DecrementHealth(50); return 60; }
+		  case 3: {DecrementHealth(50); return 70;}
+		  case 4: {DecrementHealth(50); return 100; }
+		  default: {return 0; }
+		}
+	}
+
+	else
+	{
+		DecrementHealth(50);
+		return 10;
+	}
+
 }
 
 void AZombieBase::Hit(ACharacterBase* Player,FHitResult HitResult)
@@ -117,8 +149,16 @@ void AZombieBase::Hit(ACharacterBase* Player,FHitResult HitResult)
 			FString BoneName = HitResult.BoneName.ToString();
 				if (BoneName == FString("None"))
 					return;
-
-			PState->IncrementPoints(GetPointsForKill(BoneName));
+				if (uint8 HitPart = GetHitPart(BoneName))
+				{
+					if (uint8 PointsForHit = GetPointsForHit(HitPart))
+					{
+					
+						PState->IncrementPoints(PointsForHit);
+					}
+					
+				}
+			
 		}
 	}
 }

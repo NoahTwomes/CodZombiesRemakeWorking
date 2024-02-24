@@ -36,7 +36,7 @@ protected:
 	FTimerHandle TZombieSpawnHandle;
 
 
-	uint16 ZombiesRemaining;
+	uint32 ZombiesRemaining;
 	
 
 protected:
@@ -51,4 +51,5 @@ protected:
 
 public:
 	void NewZoneActive(uint8 ZoneNumber);
+	void ZombieKilled();
 };

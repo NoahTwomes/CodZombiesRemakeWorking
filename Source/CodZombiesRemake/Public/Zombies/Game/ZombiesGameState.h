@@ -17,10 +17,14 @@ public:
 	AZombiesGameState();
 
 protected:
-	uint16 RoundNumber;
-	uint8 ZombiesOnMap;
+	uint16 RoundNumber; //set to replicate
+	uint8 ZombiesOnMap; //Set to replicate
+	uint16 TotalZombiesRemaining; //Set to replicate
 
 public:
 	uint16 GetRoundNumber();
 	void IncrementRoundNumber();
+	void SetTotalZombiesRemaining(const uint16& ZombieCount);
+	uint16 GetTotalZombiesRemaining();
+	void ZombieKilled();
 };
