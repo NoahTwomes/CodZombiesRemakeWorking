@@ -83,8 +83,9 @@ protected:
 	int32 MagazineMaxAmmo;
 
 
-
+	UPROPERTY(Replicated)
 	int32 CurrentTotalAmmo;
+	UPROPERTY(Replicated)
 	int32 CurrentMagazineAmmo;
 
 
@@ -101,10 +102,10 @@ protected:
 	virtual void Server_Fire_Implementation(const TArray<FHitResult>& HitResults);
 
 public:	
-	virtual TArray<FHitResult> Fire(class ACharacterBase* ShootingPlayer);
+	virtual bool Fire(class ACharacterBase* ShootingPlayer);
 	FWeaponDamage GetWeaponDamage();
 
-	virtual void Reload();
+	virtual bool Reload();
 
 	//first element is magazine ammo, second element is total ammo
 	TArray<int32> GetCurrentAmmo();

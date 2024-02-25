@@ -8,6 +8,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Animation/AnimInstance.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AWeaponBase::AWeaponBase()
@@ -32,6 +33,14 @@ void AWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void AWeaponBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(AWeaponBase, CurrentTotalAmmo, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(AWeaponBase, CurrentMagazineAmmo, COND_OwnerOnly);
 }
 
 TArray<FHitResult> AWeaponBase::PerformLineTrace(ACharacterBase* ShootingPlayer)
@@ -78,12 +87,17 @@ bool AWeaponBase::Server_Fire_Validate(const TArray<FHitResult>& HitResults)
 
 void AWeaponBase::Server_Fire_Implementation(const TArray<FHitResult>& HitResults)
 {
-
+	if (CurrentMagazineAmmo > 0)
+		--CurrentMagazineAmmo;
+	UE_LOG(LogTemp, Warning, TEXT("ServerAmmo: %d"), CurrentMagazineAmmo);
 }
 
-TArray<FHitResult> AWeaponBase::Fire(ACharacterBase* ShootingPlayer)
+bool AWeaponBase::Fire(ACharacterBase* ShootingPlayer)
 {
-	return TArray<FHitResult>();
+	if (CurrentMagazineAmmo > 0)
+	--CurrentMagazineAmmo;
+	UE_LOG(LogTemp, Warning, TEXT("ClientAmmo: %d"), CurrentMagazineAmmo);
+	return true;
 }
 
 FWeaponDamage AWeaponBase::GetWeaponDamage()
@@ -91,9 +105,9 @@ FWeaponDamage AWeaponBase::GetWeaponDamage()
 	return WeaponDamage;
 }
 
-void AWeaponBase::Reload()
+bool AWeaponBase::Reload()
 {
-
+	return true;
 }
 
 TArray<int32> AWeaponBase::GetCurrentAmmo()

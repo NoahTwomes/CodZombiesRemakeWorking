@@ -156,6 +156,8 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 		PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ACharacterBase::OnAimingStart);
 		PlayerInputComponent->BindAction("Aim", IE_Released, this, &ACharacterBase::OnAimingEnd);
+
+		PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ACharacterBase::OnReload);
 	}
 
 }
@@ -276,23 +278,44 @@ void ACharacterBase::OnFire()
 	
 	if (CurrentWeapon)
 	{
-		CurrentWeapon->Fire(this);
-		if (UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance())
+		if (CurrentWeapon->Fire(this))
 		{
-			if (UAnimMontage* FireMontage = CurrentWeapon->GetFireAnimMontage())
+			if (UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance())
 			{
-				UE_LOG(LogTemp, Warning, TEXT("PLAYING FIRE MONTAGE"));
-				AnimInstance->Montage_Play(FireMontage);
-				if (bIsAiming)
-					AnimInstance->Montage_JumpToSection(FName("FireADS"), FireMontage);
-				else
-					AnimInstance->Montage_JumpToSection(FName("FireHip"), FireMontage);
+				if (UAnimMontage* FireMontage = CurrentWeapon->GetFireAnimMontage())
+				{
+					UE_LOG(LogTemp, Warning, TEXT("PLAYING FIRE MONTAGE"));
+					AnimInstance->Montage_Play(FireMontage);
+					if (bIsAiming)
+						AnimInstance->Montage_JumpToSection(FName("FireADS"), FireMontage);
+					else
+						AnimInstance->Montage_JumpToSection(FName("FireHip"), FireMontage);
+				}
 			}
 		}
 
 	}
 
 	
+}
+
+void ACharacterBase::OnReload()
+{
+	if (CurrentWeapon && CurrentWeapon->Reload())
+	{
+		
+		
+		if (UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance())
+		{
+			if (UAnimMontage* FireMontage = CurrentWeapon->GetFireAnimMontage())
+			{
+				AnimInstance->Montage_Play(FireMontage);
+				AnimInstance->Montage_JumpToSection(FName("Reload"), FireMontage);
+
+			}
+		}
+		
+	}
 }
 
 void ACharacterBase::OnAimingStart()

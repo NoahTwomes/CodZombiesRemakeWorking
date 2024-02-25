@@ -24,49 +24,58 @@ AWeaponSemi::AWeaponSemi()
 
 void AWeaponSemi::Server_Fire_Implementation(const TArray<FHitResult>& HitResults)
 {
-	UE_LOG(LogTemp, Warning, TEXT("SERVER FIRE FUNTION"));
 
 
-	if (FireAnimation)
+	if (CurrentMagazineAmmo > 0)
 	{
-		WeaponMesh->PlayAnimation(FireAnimation, false);
-	}
-
-
-	if (HitResults.Num() > 0)
-	{
-		for (FHitResult Result : HitResults)
+		Super::Server_Fire_Implementation(HitResults);
+		--CurrentMagazineAmmo;
+		if (FireAnimation)
 		{
-			if (AActor* HitActor = Result.GetActor())
-			{
-				if (AZombieBase* Zombie = Cast<AZombieBase>(Result.GetActor()))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("ZOMBIE HIT %s"), *Zombie->GetName());
-					if (ACharacterBase* Player = Cast<ACharacterBase>(GetOwner()))
-						Zombie->Hit(Player, Result);
-				}
-
-
-				UE_LOG(LogTemp, Warning, TEXT("Actor Name: %s"), *HitActor->GetName());
-			}
+			WeaponMesh->PlayAnimation(FireAnimation, false);
 		}
 
+
+		if (HitResults.Num() > 0)
+		{
+			for (FHitResult Result : HitResults)
+			{
+				if (AActor* HitActor = Result.GetActor())
+				{
+					if (AZombieBase* Zombie = Cast<AZombieBase>(HitActor))
+					{
+						UE_LOG(LogTemp, Warning, TEXT("ZOMBIE HIT %s"), *Zombie->GetName());
+						if (ACharacterBase* Player = Cast<ACharacterBase>(GetOwner()))
+							Zombie->Hit(Player, Result);
+					}
+
+
+					UE_LOG(LogTemp, Warning, TEXT("Actor Name: %s"), *HitActor->GetName());
+				}
+			}
+
+		}
 	}
 
 }
 
 
-TArray<FHitResult> AWeaponSemi::Fire(ACharacterBase* ShootingPlayer)
+bool AWeaponSemi::Fire(ACharacterBase* ShootingPlayer)
 {
-	UE_LOG(LogTemp, Warning, TEXT("SHOOTING 1911"));
+	
 
-	if (FireAnimation)
+	if (CurrentMagazineAmmo > 0)
 	{
-		WeaponMesh->PlayAnimation(FireAnimation, false);
-	}
+		Super::Fire(ShootingPlayer);
 
-	if (GetWorld()->IsServer())
-	{
+		UE_LOG(LogTemp, Warning, TEXT("SHOOTING 1911"));
+
+		if (FireAnimation)
+		{
+			WeaponMesh->PlayAnimation(FireAnimation, false);
+		}
+
+	
 
 		TArray<FHitResult> HitResults = PerformLineTrace(ShootingPlayer);
 		if (HitResults.Num() > 0)
@@ -74,13 +83,10 @@ TArray<FHitResult> AWeaponSemi::Fire(ACharacterBase* ShootingPlayer)
 			for (FHitResult& Result : HitResults)
 			{
 				FString HitBone = Result.BoneName.ToString();
-				UE_LOG(LogTemp, Warning, TEXT("Hit Bone: %s"), *HitBone);
-
 				if (AActor* HitActor = Result.GetActor())
 				{
-					if (AZombieBase* Zombie = Cast<AZombieBase>(Result.GetActor()))
+					if (AZombieBase* Zombie = Cast<AZombieBase>(HitActor))
 					{
-						UE_LOG(LogTemp, Warning, TEXT("ZOMBIE HIT %s"), *Zombie->GetName());
 						Zombie->Hit(ShootingPlayer, Result);
 					}
 
@@ -90,40 +96,36 @@ TArray<FHitResult> AWeaponSemi::Fire(ACharacterBase* ShootingPlayer)
 			}
 
 		}
-	}
 
-	else
-	{
-		TArray<FHitResult> HitResults = PerformLineTrace(ShootingPlayer);
-		if (HitResults.Num() > 0)
+		if (!GetWorld()->IsServer())
 		{
-			for (FHitResult& Result : HitResults)
-			{
-
-
-				if (AActor* HitActor = Result.GetActor())
-				{
-					if (AZombieBase* Zombie = Cast<AZombieBase>(Result.GetActor()))
-					{
-						UE_LOG(LogTemp, Warning, TEXT("ZOMBIE HIT %s"), *Zombie->GetName());
-						Zombie->Hit(ShootingPlayer, Result);
-					}
-
-
-					UE_LOG(LogTemp, Warning, TEXT("Actor Name: %s"), *HitActor->GetName());
-				}
-			}
-
+			Server_Fire(HitResults);
 		}
-		Server_Fire(HitResults);
+	
+		return true;
 	}
-	return TArray<FHitResult>();
+	return false;
 
 
 }
 
-void AWeaponSemi::Reload()
+bool AWeaponSemi::Reload()
 {
+	if (CurrentTotalAmmo > 0 && CurrentMagazineAmmo != MagazineMaxAmmo)
+	{
+		if (ReloadAnimation)
+		{
+			WeaponMesh->PlayAnimation(ReloadAnimation, false);
+		}
 
+		int Difference = MagazineMaxAmmo - CurrentMagazineAmmo;
+		CurrentTotalAmmo -= Difference;
+		CurrentMagazineAmmo = MagazineMaxAmmo;
+		return true;
+	}
+	else
+		return false;
+
+	
 }
 

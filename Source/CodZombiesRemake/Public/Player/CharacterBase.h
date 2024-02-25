@@ -91,7 +91,7 @@ protected:
 
 
 	virtual void OnFire();
-
+	void OnReload();
 	 virtual void OnAimingStart();
 	 virtual void OnAimingEnd();
 
