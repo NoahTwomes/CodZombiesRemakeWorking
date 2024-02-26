@@ -108,6 +108,7 @@ void ACharacterBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ACharacterBase, CurrentWeapon);
+	DOREPLIFETIME_CONDITION(ACharacterBase, bIsAiming, COND_SkipOwner);
 }
 
 void ACharacterBase::OnRep_AttachWeapon()
@@ -115,7 +116,7 @@ void ACharacterBase::OnRep_AttachWeapon()
 	if (CurrentWeapon)
 	{
 
-		if (IsLocallyControlled())
+		if (true || IsLocallyControlled())
 		{
 
 			CurrentWeapon->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("s_weaponSocket"));
@@ -130,6 +131,8 @@ void ACharacterBase::OnRep_AttachWeapon()
 		}
 	}
 }
+
+
 
 
 
@@ -318,14 +321,28 @@ void ACharacterBase::OnReload()
 	}
 }
 
+bool ACharacterBase::Server_SetAiming_Validate(bool WantsToAim)
+{
+	return true;
+}
+
+void ACharacterBase::Server_SetAiming_Implementation(bool WantsToAim)
+{
+	bIsAiming = WantsToAim;
+}
+
 void ACharacterBase::OnAimingStart()
 {
 	bIsAiming = true;
+	if (!HasAuthority())
+	Server_SetAiming(bIsAiming);
 }
 
 void ACharacterBase::OnAimingEnd()
 {
 	bIsAiming = false;
+	if (!HasAuthority())
+	Server_SetAiming(bIsAiming);
 }
 
 

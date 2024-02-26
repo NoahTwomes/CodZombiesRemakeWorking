@@ -17,9 +17,16 @@ AWeaponSemi::AWeaponSemi()
 	MagazineMaxAmmo = 7;
 
 
+
+}
+
+void AWeaponSemi::BeginPlay()
+{
+	Super::BeginPlay();
 	CurrentTotalAmmo = WeaponMaxAmmo;
 	CurrentMagazineAmmo = MagazineMaxAmmo;
 }
+
 
 
 void AWeaponSemi::Server_Fire_Implementation(const TArray<FHitResult>& HitResults)
@@ -30,11 +37,7 @@ void AWeaponSemi::Server_Fire_Implementation(const TArray<FHitResult>& HitResult
 	{
 		Super::Server_Fire_Implementation(HitResults);
 		--CurrentMagazineAmmo;
-		if (FireAnimation)
-		{
-			WeaponMesh->PlayAnimation(FireAnimation, false);
-		}
-
+	
 
 		if (HitResults.Num() > 0)
 		{
@@ -44,19 +47,44 @@ void AWeaponSemi::Server_Fire_Implementation(const TArray<FHitResult>& HitResult
 				{
 					if (AZombieBase* Zombie = Cast<AZombieBase>(HitActor))
 					{
-						UE_LOG(LogTemp, Warning, TEXT("ZOMBIE HIT %s"), *Zombie->GetName());
+						
 						if (ACharacterBase* Player = Cast<ACharacterBase>(GetOwner()))
 							Zombie->Hit(Player, Result);
 					}
 
 
-					UE_LOG(LogTemp, Warning, TEXT("Actor Name: %s"), *HitActor->GetName());
+
 				}
 			}
 
 		}
+		Multi_Fire(HitResults[0]);
 	}
 
+}
+
+void AWeaponSemi::Multi_Fire_Implementation(const FHitResult& HitResult)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(GetOwner()))
+	{
+		if (!Character->IsLocallyControlled() && FireAnimation)
+		{
+			if (UAnimInstance* AnimInstance = Character->GetMesh1P()->GetAnimInstance())
+			{
+				if (FPSArmsFireMontage)
+				{
+					AnimInstance->Montage_Play(FPSArmsFireMontage);
+					if (Character->GetIsAiming())
+						AnimInstance->Montage_JumpToSection(FName("FireADS"), FPSArmsFireMontage);
+					else
+					AnimInstance->Montage_JumpToSection(FName("FireHip"), FPSArmsFireMontage);
+
+				}
+			}
+
+			WeaponMesh->PlayAnimation(FireAnimation, false);
+		}
+	}
 }
 
 
@@ -97,11 +125,10 @@ bool AWeaponSemi::Fire(ACharacterBase* ShootingPlayer)
 
 		}
 
-		if (!GetWorld()->IsServer())
-		{
+		if (GetWorld()->IsServer())
+			Multi_Fire(HitResults[0]);
+		else
 			Server_Fire(HitResults);
-		}
-	
 		return true;
 	}
 	return false;
@@ -109,9 +136,11 @@ bool AWeaponSemi::Fire(ACharacterBase* ShootingPlayer)
 
 }
 
+
 bool AWeaponSemi::Reload()
 {
-	if (CurrentTotalAmmo > 0 && CurrentMagazineAmmo != MagazineMaxAmmo)
+	return Super::Reload();
+	/*if (CurrentTotalAmmo > 0 && CurrentMagazineAmmo != MagazineMaxAmmo)
 	{
 		if (ReloadAnimation)
 		{
@@ -119,12 +148,21 @@ bool AWeaponSemi::Reload()
 		}
 
 		int Difference = MagazineMaxAmmo - CurrentMagazineAmmo;
-		CurrentTotalAmmo -= Difference;
-		CurrentMagazineAmmo = MagazineMaxAmmo;
+		if (CurrentTotalAmmo - Difference >= 0)
+		{
+			CurrentTotalAmmo -= Difference;
+			CurrentMagazineAmmo = MagazineMaxAmmo;
+		}
+		else
+		{
+			CurrentMagazineAmmo += CurrentTotalAmmo;
+			CurrentTotalAmmo = 0;
+		}
+	
 		return true;
 	}
 	else
-		return false;
+		return false;*/
 
 	
 }

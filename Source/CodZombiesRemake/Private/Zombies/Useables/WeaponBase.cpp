@@ -92,6 +92,8 @@ void AWeaponBase::Server_Fire_Implementation(const TArray<FHitResult>& HitResult
 	UE_LOG(LogTemp, Warning, TEXT("ServerAmmo: %d"), CurrentMagazineAmmo);
 }
 
+
+
 bool AWeaponBase::Fire(ACharacterBase* ShootingPlayer)
 {
 	if (CurrentMagazineAmmo > 0)
@@ -105,9 +107,88 @@ FWeaponDamage AWeaponBase::GetWeaponDamage()
 	return WeaponDamage;
 }
 
-bool AWeaponBase::Reload()
+bool AWeaponBase::Multi_Fire_Validate(const FHitResult& HitResult)
 {
 	return true;
+}
+
+void AWeaponBase::Multi_Fire_Implementation(const FHitResult& HitResult)
+{
+
+}
+
+bool AWeaponBase::Server_Reload_Validate()
+{
+	return true;
+}
+
+void AWeaponBase::Server_Reload_Implementation()
+{
+	Reload();
+	
+}
+
+bool AWeaponBase::Multi_Reload_Validate()
+{
+	return true;
+}
+
+void AWeaponBase::Multi_Reload_Implementation()
+{
+
+	if (ACharacterBase* Character = Cast<ACharacterBase>(GetOwner()))
+	{
+		if (!Character->IsLocallyControlled() && ReloadAnimation)
+		{
+			if (UAnimInstance* AnimInstance = Character->GetMesh1P()->GetAnimInstance())
+			{
+				if (FPSArmsFireMontage)
+				{
+					AnimInstance->Montage_Play(FPSArmsFireMontage);
+					AnimInstance->Montage_JumpToSection(FName("Reload"), FPSArmsFireMontage);
+
+				}
+			}
+
+			WeaponMesh->PlayAnimation(ReloadAnimation, false);
+		}
+	}
+}
+
+bool AWeaponBase::Reload()
+{
+	if (CurrentTotalAmmo > 0 && CurrentMagazineAmmo != MagazineMaxAmmo)
+	{
+		if (APawn* Pawn = Cast<APawn>(GetOwner()))
+		{
+			if (Pawn->IsLocallyControlled() && ReloadAnimation)
+			{
+				WeaponMesh->PlayAnimation(ReloadAnimation, false);
+			}
+		}
+		
+
+		int Difference = MagazineMaxAmmo - CurrentMagazineAmmo;
+		if (CurrentTotalAmmo - Difference >= 0)
+		{
+			CurrentTotalAmmo -= Difference;
+			CurrentMagazineAmmo = MagazineMaxAmmo;
+		}
+		else
+		{
+			CurrentMagazineAmmo += CurrentTotalAmmo;
+			CurrentTotalAmmo = 0;
+		}
+
+		if (GetWorld()->IsServer())
+			Multi_Reload();
+		else
+			Server_Reload();
+		
+		return true;
+	}
+	else
+		return false;
 }
 
 TArray<int32> AWeaponBase::GetCurrentAmmo()
