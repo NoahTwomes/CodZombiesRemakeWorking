@@ -58,7 +58,10 @@ void AWeaponSemi::Server_Fire_Implementation(const TArray<FHitResult>& HitResult
 			}
 
 		}
-		Multi_Fire(HitResults[0]);
+		if (HitResults.Num() > 0)
+			Multi_Fire(HitResults[0]);
+		else
+			Multi_Fire(FHitResult());
 	}
 
 }
@@ -69,15 +72,15 @@ void AWeaponSemi::Multi_Fire_Implementation(const FHitResult& HitResult)
 	{
 		if (!Character->IsLocallyControlled() && FireAnimation)
 		{
-			if (UAnimInstance* AnimInstance = Character->GetMesh1P()->GetAnimInstance())
+			if (UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance())
 			{
-				if (FPSArmsFireMontage)
+				if (ThirdPersonMontage)
 				{
-					AnimInstance->Montage_Play(FPSArmsFireMontage);
+					AnimInstance->Montage_Play(ThirdPersonMontage);
 					if (Character->GetIsAiming())
-						AnimInstance->Montage_JumpToSection(FName("FireADS"), FPSArmsFireMontage);
+						AnimInstance->Montage_JumpToSection(FName("FireADS"), ThirdPersonMontage);
 					else
-					AnimInstance->Montage_JumpToSection(FName("FireHip"), FPSArmsFireMontage);
+					AnimInstance->Montage_JumpToSection(FName("FireHip"), ThirdPersonMontage);
 
 				}
 			}
@@ -126,7 +129,12 @@ bool AWeaponSemi::Fire(ACharacterBase* ShootingPlayer)
 		}
 
 		if (GetWorld()->IsServer())
-			Multi_Fire(HitResults[0]);
+		{
+			if (HitResults.Num() > 0)
+				Multi_Fire(HitResults[0]);
+			else
+				Multi_Fire(FHitResult());
+		}
 		else
 			Server_Fire(HitResults);
 		return true;

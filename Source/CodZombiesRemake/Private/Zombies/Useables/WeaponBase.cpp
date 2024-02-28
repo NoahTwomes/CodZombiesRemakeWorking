@@ -140,12 +140,12 @@ void AWeaponBase::Multi_Reload_Implementation()
 	{
 		if (!Character->IsLocallyControlled() && ReloadAnimation)
 		{
-			if (UAnimInstance* AnimInstance = Character->GetMesh1P()->GetAnimInstance())
+			if (UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance())
 			{
-				if (FPSArmsFireMontage)
+				if (ThirdPersonMontage)
 				{
-					AnimInstance->Montage_Play(FPSArmsFireMontage);
-					AnimInstance->Montage_JumpToSection(FName("Reload"), FPSArmsFireMontage);
+					AnimInstance->Montage_Play(ThirdPersonMontage);
+					AnimInstance->Montage_JumpToSection(FName("Reload"), ThirdPersonMontage);
 
 				}
 			}

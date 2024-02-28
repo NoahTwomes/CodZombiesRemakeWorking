@@ -42,7 +42,8 @@ UENUM(BlueprintType)
 enum EWeaponID
 {
 	Colt1911 UMETA(DisplayName = "1911"),
-	M1Carbine UMETA(DisplayName = "M1Carbine")
+	M1Carbine UMETA(DisplayName = "M1Carbine"),
+	STG44 UMETA(DisplayName = "STG44")
 };
 
 UCLASS()
@@ -66,6 +67,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
 	class UAnimMontage* FPSArmsFireMontage;
+	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
+	class UAnimMontage* ThirdPersonMontage;
 
 	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
 	class UAnimationAsset* ReloadAnimation;
