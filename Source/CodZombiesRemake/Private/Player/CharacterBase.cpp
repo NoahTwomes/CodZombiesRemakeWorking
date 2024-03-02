@@ -155,7 +155,9 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACharacterBase::Look);
 
 		PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ACharacterBase::Interact);
+
 		PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ACharacterBase::OnFire);
+		PlayerInputComponent->BindAction("Fire", IE_Released, this, &ACharacterBase::OnStopFire);
 
 		PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ACharacterBase::OnAimingStart);
 		PlayerInputComponent->BindAction("Aim", IE_Released, this, &ACharacterBase::OnAimingEnd);
@@ -300,6 +302,12 @@ void ACharacterBase::OnFire()
 	}
 
 	
+}
+
+void ACharacterBase::OnStopFire()
+{
+	if (CurrentWeapon)
+		CurrentWeapon->StopFiring();
 }
 
 void ACharacterBase::OnReload()

@@ -121,6 +121,7 @@ protected:
 
 public:	
 	virtual bool Fire(class ACharacterBase* ShootingPlayer);
+	virtual void StopFiring();
 	FWeaponDamage GetWeaponDamage();
 
 	virtual bool Reload();

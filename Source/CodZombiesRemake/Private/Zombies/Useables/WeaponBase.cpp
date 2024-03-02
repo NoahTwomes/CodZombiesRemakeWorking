@@ -102,6 +102,11 @@ bool AWeaponBase::Fire(ACharacterBase* ShootingPlayer)
 	return true;
 }
 
+void AWeaponBase::StopFiring()
+{
+
+}
+
 FWeaponDamage AWeaponBase::GetWeaponDamage()
 {
 	return WeaponDamage;
