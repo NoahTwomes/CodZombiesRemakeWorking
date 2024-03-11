@@ -18,7 +18,10 @@ public:
 
 
 protected:
-	UPROPERTY(Replicated) //replicated using for effects on clients
+	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
+	float FireRate;
+
+	UPROPERTY(ReplicatedUsing = OnRep_StartFullAutoFire) //replicated using for effects on clients
 	bool bIsFiring;
 
 	UFUNCTION()
@@ -35,6 +38,7 @@ protected:
 
 	virtual void Server_Fire_Implementation(const TArray<FHitResult>& HitResults) override;
 
+	void OnClientFire();
 
 public:
 	virtual bool Fire(class ACharacterBase* ShootingPlayer) override;

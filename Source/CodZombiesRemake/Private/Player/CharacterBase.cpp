@@ -283,6 +283,7 @@ void ACharacterBase::OnFire()
 	
 	if (CurrentWeapon)
 	{
+		
 		if (CurrentWeapon->Fire(this))
 		{
 			if (UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance())
