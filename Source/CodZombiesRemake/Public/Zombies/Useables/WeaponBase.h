@@ -134,4 +134,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TEnumAsByte<EWeaponID> GetWeaponID();
 
+	class USkeletalMeshComponent* GetWeaponMesh() { return WeaponMesh; }
+
 };

@@ -29,6 +29,10 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
 	TSubclassOf<class AWeaponBase> StartingWeaponClass;
+	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
+	TSubclassOf<class AWeaponBase> SecondWeaponClass;
+	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
+	TSubclassOf<class AWeaponBase> ThirdWeaponClass;
 
 	UPROPERTY(ReplicatedUsing = OnRep_AttachWeapon)
 	class AWeaponBase* CurrentWeapon;
@@ -101,6 +105,8 @@ protected:
 	void OnReload();
 	 virtual void OnAimingStart();
 	 virtual void OnAimingEnd();
+	 void SwitchNextWeapon();
+	 void SwitchPreviousWeapon();
 
 
 
