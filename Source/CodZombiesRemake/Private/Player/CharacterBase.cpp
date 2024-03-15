@@ -71,7 +71,7 @@ void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-
+	
 
 
 	//Add Input Mapping Context
@@ -93,25 +93,25 @@ void ACharacterBase::BeginPlay()
 		if (CurrentWeapon)
 		{
 
-
+			PreviousWeapon = CurrentWeapon;
 			WeaponArray.Add(CurrentWeapon);
-
+			CurrentWeapon->WeaponIsNowInHand(true);
 			OnRep_AttachWeapon();
 			UE_LOG(LogTemp, Warning, TEXT("THIS WORKED"));
 
 		}
-		if (AWeaponBase* Weapon = GetWorld()->SpawnActor<AWeaponBase>(SecondWeaponClass, SpawnParams))
-		{
-			Weapon->GetWeaponMesh()->SetHiddenInGame(true);
-			Weapon->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("s_weaponSocket"));
-			WeaponArray.Add(Weapon);
-		}
-		if (AWeaponBase* Weapon = GetWorld()->SpawnActor<AWeaponBase>(ThirdWeaponClass, SpawnParams))
-		{
-			Weapon->GetWeaponMesh()->SetHiddenInGame(true);
-			Weapon->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("s_weaponSocket"));
-			WeaponArray.Add(Weapon);
-		}
+		//if (AWeaponBase* Weapon = GetWorld()->SpawnActor<AWeaponBase>(SecondWeaponClass, SpawnParams))
+		//{
+	
+		//	Weapon->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("s_weaponSocket"));
+		//	WeaponArray.Add(Weapon);
+	//	}
+		//if (AWeaponBase* Weapon = GetWorld()->SpawnActor<AWeaponBase>(ThirdWeaponClass, SpawnParams))
+		//{
+
+		//	Weapon->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("s_weaponSocket"));
+		//	WeaponArray.Add(Weapon);
+		//}
 	}
 }
 
@@ -120,14 +120,33 @@ void ACharacterBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ACharacterBase, CurrentWeapon);
+	DOREPLIFETIME_CONDITION(ACharacterBase, WeaponIndex, COND_OwnerOnly);
+	DOREPLIFETIME(ACharacterBase, WeaponArray);
 	DOREPLIFETIME_CONDITION(ACharacterBase, bIsAiming, COND_SkipOwner);
+}
+
+bool ACharacterBase::Server_SwtichWeapon_Validate(AWeaponBase* NewWeapon, int32 NewWeaponIndex)
+{
+	return true;
+}
+
+void ACharacterBase::Server_SwtichWeapon_Implementation(AWeaponBase* NewWeapon, int32 NewWeaponIndex)
+{
+	WeaponIndex = NewWeaponIndex;
+	CurrentWeapon = NewWeapon;
+	OnRep_AttachWeapon();
 }
 
 void ACharacterBase::OnRep_AttachWeapon()
 {
+	if (PreviousWeapon)
+	{
+		PreviousWeapon->WeaponIsNowInHand(false);
+	}
 	if (CurrentWeapon)
 	{
-
+		CurrentWeapon->WeaponIsNowInHand(true);
+		PreviousWeapon = CurrentWeapon;
 		if (true || IsLocallyControlled())
 		{
 
@@ -155,9 +174,9 @@ void ACharacterBase::SwitchNextWeapon()
 			++WeaponIndex;
 			if (AWeaponBase* NextWeapon = WeaponArray[WeaponIndex])
 			{
-				CurrentWeapon->GetWeaponMesh()->SetHiddenInGame(true);
+				CurrentWeapon->WeaponIsNowInHand(false);
 				CurrentWeapon = NextWeapon;
-				CurrentWeapon->GetWeaponMesh()->SetHiddenInGame(false);
+				CurrentWeapon->WeaponIsNowInHand(true);
 			}
 		}
 		else
@@ -165,13 +184,14 @@ void ACharacterBase::SwitchNextWeapon()
 			WeaponIndex = 0;
 			if (AWeaponBase* NextWeapon = WeaponArray[WeaponIndex])
 			{
-				CurrentWeapon->GetWeaponMesh()->SetHiddenInGame(true);
+				CurrentWeapon->WeaponIsNowInHand(false);
 				CurrentWeapon = NextWeapon;
-				CurrentWeapon->GetWeaponMesh()->SetHiddenInGame(false);
+				CurrentWeapon->WeaponIsNowInHand(true);
 			}
 		}
-		
+		Server_SwtichWeapon(CurrentWeapon, WeaponIndex);
 	}
+	
 }
 
 void ACharacterBase::SwitchPreviousWeapon()
@@ -184,9 +204,9 @@ void ACharacterBase::SwitchPreviousWeapon()
 			--WeaponIndex;
 			if (AWeaponBase* NextWeapon = WeaponArray[WeaponIndex])
 			{
-				CurrentWeapon->GetWeaponMesh()->SetHiddenInGame(true);
+				CurrentWeapon->WeaponIsNowInHand(false);
 				CurrentWeapon = NextWeapon;
-				CurrentWeapon->GetWeaponMesh()->SetHiddenInGame(false);
+				CurrentWeapon->WeaponIsNowInHand(true);
 			}
 		}
 		else
@@ -194,12 +214,12 @@ void ACharacterBase::SwitchPreviousWeapon()
 			WeaponIndex = WeaponArray.Num() - 1;
 			if (AWeaponBase* NextWeapon = WeaponArray[WeaponIndex])
 			{
-				CurrentWeapon->GetWeaponMesh()->SetHiddenInGame(true);
+				CurrentWeapon->WeaponIsNowInHand(false);
 				CurrentWeapon = NextWeapon;
-				CurrentWeapon->GetWeaponMesh()->SetHiddenInGame(false);
+				CurrentWeapon->WeaponIsNowInHand(true);
 			}
 		}
-
+		Server_SwtichWeapon(CurrentWeapon, WeaponIndex);
 	}
 }
 
@@ -344,6 +364,27 @@ void ACharacterBase::SetInteractableObject()
 	{
 		Interactable = nullptr;
 	
+	}
+}
+
+void ACharacterBase::GivePlayerWeapon(AWeaponBase* Weapon)
+{
+	if (HasAuthority() && Weapon)
+	{
+
+		UE_LOG(LogTemp, Warning, TEXT("ADDING TO WEAPON ARRAY"));
+		if (WeaponArray.Num() >= 2)
+		{
+			WeaponArray[WeaponIndex]->Destroy();
+			WeaponArray[WeaponIndex] = Weapon;
+		}
+		else
+		{
+			WeaponArray.Add(Weapon);
+			WeaponIndex = WeaponArray.Num() - 1;
+		}
+		CurrentWeapon = Weapon;
+		OnRep_AttachWeapon();
 	}
 }
 

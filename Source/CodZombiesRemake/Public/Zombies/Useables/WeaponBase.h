@@ -133,7 +133,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	TEnumAsByte<EWeaponID> GetWeaponID();
-
+	void WeaponIsNowInHand(bool InHand);
 	class USkeletalMeshComponent* GetWeaponMesh() { return WeaponMesh; }
 
 };

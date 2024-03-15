@@ -33,6 +33,7 @@ void AWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	WeaponMesh->SetHiddenInGame(true);
 }
 
 void AWeaponBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -210,6 +211,11 @@ UAnimMontage* AWeaponBase::GetFireAnimMontage()
 TEnumAsByte<EWeaponID> AWeaponBase::GetWeaponID()
 {
 	return WeaponID;
+}
+
+void AWeaponBase::WeaponIsNowInHand(bool InHand)
+{
+	WeaponMesh->SetHiddenInGame(!InHand);
 }
 
 

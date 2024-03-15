@@ -36,11 +36,20 @@ public:
 
 	UPROPERTY(ReplicatedUsing = OnRep_AttachWeapon)
 	class AWeaponBase* CurrentWeapon;
+	//UPROPERTY(Replicated)
+	class AWeaponBase* PreviousWeapon;
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SwtichWeapon(class AWeaponBase* NewWeapon, int32 NewWeaponIndex);
+	bool Server_SwtichWeapon_Validate(class AWeaponBase* NewWeapon, int32 NewWeaponIndex);
+	void Server_SwtichWeapon_Implementation(class AWeaponBase* NewWeapon, int32 NewWeaponIndex);
+
 	UFUNCTION()
 	void OnRep_AttachWeapon();
 
+	UPROPERTY(Replicated)
 	int32 WeaponIndex;
-	TArray<AWeaponBase*> WeaponArray;
+	UPROPERTY(Replicated)
+	 TArray<AWeaponBase*> WeaponArray;
 
 	//set to replicate skip owner
 	UPROPERTY(Replicated)
@@ -76,6 +85,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	class AWeaponBase* GetCurrentWeapon();
 
+public:
+	void GivePlayerWeapon(class AWeaponBase* Weapon);
+
 protected:
 	UPROPERTY(BlueprintAssignable)
 	FInteractChanged OnInteractChanged;
@@ -97,7 +109,6 @@ protected:
 	bool Server_Interact_Validate(class AInteractableBase* InteractingObject);
 	void Server_Interact_Implementation(class AInteractableBase* InteractingObject);
 	void SetInteractableObject();
-
 
 
 	virtual void OnFire();
