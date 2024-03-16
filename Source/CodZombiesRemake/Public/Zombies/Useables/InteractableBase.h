@@ -27,7 +27,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	FString GetUIMessage();
+	virtual FString GetUIMessage(class ACharacterBase* Player);
 
 	virtual void Use(class ACharacterBase* Player);
 

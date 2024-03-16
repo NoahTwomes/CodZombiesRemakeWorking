@@ -26,6 +26,7 @@ AWeaponBase::AWeaponBase()
  
 	CurrentTotalAmmo = WeaponMaxAmmo;
 	CurrentMagazineAmmo = MagazineMaxAmmo;
+	bIsFiring = false;
 }
 
 // Called when the game starts or when spawned
@@ -88,9 +89,9 @@ bool AWeaponBase::Server_Fire_Validate(const TArray<FHitResult>& HitResults)
 
 void AWeaponBase::Server_Fire_Implementation(const TArray<FHitResult>& HitResults)
 {
-	if (CurrentMagazineAmmo > 0)
-		--CurrentMagazineAmmo;
-	UE_LOG(LogTemp, Warning, TEXT("ServerAmmo: %d"), CurrentMagazineAmmo);
+	//if (CurrentMagazineAmmo > 0)
+	//	--CurrentMagazineAmmo;
+	//UE_LOG(LogTemp, Warning, TEXT("ServerAmmo: %d"), CurrentMagazineAmmo);
 }
 
 
@@ -152,6 +153,7 @@ void AWeaponBase::Multi_Reload_Implementation()
 				{
 					AnimInstance->Montage_Play(ThirdPersonMontage);
 					AnimInstance->Montage_JumpToSection(FName("Reload"), ThirdPersonMontage);
+					
 
 				}
 			}
@@ -170,6 +172,7 @@ bool AWeaponBase::Reload()
 			if (Pawn->IsLocallyControlled() && ReloadAnimation)
 			{
 				WeaponMesh->PlayAnimation(ReloadAnimation, false);
+
 			}
 		}
 		
@@ -188,6 +191,7 @@ bool AWeaponBase::Reload()
 
 		if (GetWorld()->IsServer())
 			Multi_Reload();
+
 		else
 			Server_Reload();
 		

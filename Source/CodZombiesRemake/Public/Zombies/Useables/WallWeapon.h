@@ -32,7 +32,15 @@ protected:
 	UFUNCTION()
 	void OnRep_WeaponPurchased();
 
+	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
+	FString AmmoUIMessage;
+
+protected:
+	virtual void BeginPlay() override;
+
+
 public:
+	virtual FString GetUIMessage(class ACharacterBase* Player) override;
 	virtual void Use(class ACharacterBase* Player) override;
 
 	

@@ -152,6 +152,8 @@ void ACharacterBase::OnRep_AttachWeapon()
 
 			CurrentWeapon->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("s_weaponSocket"));
 			UE_LOG(LogTemp, Warning, TEXT("SPAWNED AND ATTEMPTED TO ATTACH WEAPON TO HAND LOCALLY"));
+			TArray<int32> CurrentAmmo = CurrentWeapon->GetCurrentAmmo();
+			OnAmmoChanged.Broadcast(CurrentAmmo[0], CurrentAmmo[1]);
 		}
 		else
 		{
@@ -163,12 +165,23 @@ void ACharacterBase::OnRep_AttachWeapon()
 	}
 }
 
+void ACharacterBase::RefreshAmmoWidget()
+{
+	if (CurrentWeapon)
+	{
+		TArray<int32> CurrentAmmo = CurrentWeapon->GetCurrentAmmo();
+		OnAmmoChanged.Broadcast(CurrentAmmo[0], CurrentAmmo[1]);
+	}
+}
+
 
 void ACharacterBase::SwitchNextWeapon()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Swithcing To Next Weapon"));
 	if (CurrentWeapon)
 	{
+		if (CurrentWeapon->IsFiring()) return;
+
 		if (WeaponArray.Num() > WeaponIndex + 1)
 		{
 			++WeaponIndex;
@@ -190,6 +203,7 @@ void ACharacterBase::SwitchNextWeapon()
 			}
 		}
 		Server_SwtichWeapon(CurrentWeapon, WeaponIndex);
+		RefreshAmmoWidget();
 	}
 	
 }
@@ -199,6 +213,7 @@ void ACharacterBase::SwitchPreviousWeapon()
 	UE_LOG(LogTemp, Warning, TEXT("Swithcing To Previous Weapon"));
 	if (CurrentWeapon)
 	{
+		if (CurrentWeapon->IsFiring()) return;
 		if ( WeaponIndex - 1 >= 0)
 		{
 			--WeaponIndex;
@@ -342,7 +357,7 @@ void ACharacterBase::SetInteractableObject()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("IS NOW A VALID PTR"));
 		Interactable = Temp;
-		OnInteractChanged.Broadcast(Interactable->GetUIMessage());
+		OnInteractChanged.Broadcast(Interactable->GetUIMessage(this));
 	
 	}
 
@@ -399,6 +414,8 @@ void ACharacterBase::OnFire()
 		
 		if (CurrentWeapon->Fire(this))
 		{
+			TArray<int32> CurrentAmmo = CurrentWeapon->GetCurrentAmmo();
+			OnAmmoChanged.Broadcast(CurrentAmmo[0], CurrentAmmo[1]);
 			if (UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance())
 			{
 				if (UAnimMontage* FireMontage = CurrentWeapon->GetFireAnimMontage())
@@ -436,6 +453,7 @@ void ACharacterBase::OnReload()
 			{
 				AnimInstance->Montage_Play(FireMontage);
 				AnimInstance->Montage_JumpToSection(FName("Reload"), FireMontage);
+				RefreshAmmoWidget();
 
 			}
 		}

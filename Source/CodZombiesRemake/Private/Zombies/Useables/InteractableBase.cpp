@@ -18,7 +18,7 @@ void AInteractableBase::BeginPlay()
 	
 }
 
-FString AInteractableBase::GetUIMessage()
+FString AInteractableBase::GetUIMessage(ACharacterBase* Player)
 {
 	return UIMessage;
 }

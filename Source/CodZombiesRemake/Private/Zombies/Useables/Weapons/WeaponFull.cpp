@@ -172,6 +172,8 @@ void AWeaponFull::OnClientFire()
 
 			if (!GetWorld()->IsServer())
 				Server_Fire(HitResults);
+
+			ShootingPlayer->RefreshAmmoWidget();
 		}
 	}
 	else

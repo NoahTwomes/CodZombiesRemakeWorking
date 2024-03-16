@@ -12,6 +12,7 @@ class UCameraComponent;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteractChanged, const FString&, OnInteractChanged);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAmmoChanged, int32, MagazineAmmo, int32, TotalAmmo);
 
 
 UCLASS()
@@ -50,10 +51,15 @@ public:
 	int32 WeaponIndex;
 	UPROPERTY(Replicated)
 	 TArray<AWeaponBase*> WeaponArray;
+	 
+	 UFUNCTION(BlueprintCallable)
+	 void RefreshAmmoWidget();
 
 	//set to replicate skip owner
 	UPROPERTY(Replicated)
 	bool bIsAiming;
+
+	TArray<AWeaponBase*>* GetWeaponArray() { return &WeaponArray; }
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetAiming(bool WantsToAim);
@@ -92,7 +98,8 @@ protected:
 	UPROPERTY(BlueprintAssignable)
 	FInteractChanged OnInteractChanged;
 
-
+	UPROPERTY(BlueprintAssignable)
+	FAmmoChanged OnAmmoChanged;
 
 	FTimerHandle TInteractTimerHandle;
 	class AInteractableBase* Interactable;

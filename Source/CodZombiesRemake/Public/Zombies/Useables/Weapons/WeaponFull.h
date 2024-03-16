@@ -43,4 +43,5 @@ protected:
 public:
 	virtual bool Fire(class ACharacterBase* ShootingPlayer) override;
 	virtual void StopFiring() override;
+	virtual bool IsFiring() override { return bIsFiring; }
 };

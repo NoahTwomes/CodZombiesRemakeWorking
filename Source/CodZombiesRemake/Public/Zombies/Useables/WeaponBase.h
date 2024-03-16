@@ -118,11 +118,15 @@ protected:
 	void Multi_Reload();
 	bool Multi_Reload_Validate();
 	virtual void Multi_Reload_Implementation();
+	
+private:
+	bool bIsFiring;
 
 public:	
 	virtual bool Fire(class ACharacterBase* ShootingPlayer);
 	virtual void StopFiring();
 	FWeaponDamage GetWeaponDamage();
+	virtual bool IsFiring() { return false; }
 
 	virtual bool Reload();
 
