@@ -26,6 +26,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
 	uint16 Cost;
 
+	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
+	uint16 AmmoCost;
+
 	UPROPERTY(ReplicatedUsing = OnRep_WeaponPurchased)
 	bool bIsUsed;
 
@@ -37,7 +40,8 @@ protected:
 
 protected:
 	virtual void BeginPlay() override;
-
+	
+	void PurchaseAmmo(class ACharacterBase* Player);
 
 public:
 	virtual FString GetUIMessage(class ACharacterBase* Player) override;

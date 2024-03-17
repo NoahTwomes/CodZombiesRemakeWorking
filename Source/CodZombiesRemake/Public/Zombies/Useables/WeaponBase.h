@@ -92,6 +92,8 @@ protected:
 	int32 CurrentMagazineAmmo;
 
 
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -118,6 +120,10 @@ protected:
 	void Multi_Reload();
 	bool Multi_Reload_Validate();
 	virtual void Multi_Reload_Implementation();
+
+	UFUNCTION(Client, Reliable)
+	void Client_RefillAmmo();
+	void Client_RefillAmmo_Implementation();
 	
 private:
 	bool bIsFiring;
@@ -130,7 +136,11 @@ public:
 
 	virtual bool Reload();
 
-	//first element is magazine ammo, second element is total ammo
+	UFUNCTION(BlueprintCallable)
+	void RefillAmmo();
+
+	bool IsTotalAmmoFull() { return CurrentTotalAmmo == WeaponMaxAmmo; ;}
+
 	TArray<int32> GetCurrentAmmo();
 
 	class UAnimMontage* GetFireAnimMontage();

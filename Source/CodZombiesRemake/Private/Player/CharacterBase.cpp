@@ -322,6 +322,8 @@ void ACharacterBase::Interact()
 			Interactable->Use(this);
 		else
 			Server_Interact(Interactable);
+
+		Interactable = nullptr;
 	}
 }
 

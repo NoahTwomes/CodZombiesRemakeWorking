@@ -15,6 +15,7 @@ AWallWeapon::AWallWeapon()
 	RootComponent = WallWeaponMesh;
 
 	Cost = 1000;
+	AmmoCost = 200;
 	bIsUsed = false;
 	AmmoUIMessage = "Press F To Buy ";
 }
@@ -23,6 +24,8 @@ void AWallWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 }
+
+
 
 void AWallWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {
@@ -48,13 +51,37 @@ FString AWallWeapon::GetUIMessage(ACharacterBase* Player)
 	return UIMessage;
 }
 
+void AWallWeapon::PurchaseAmmo(ACharacterBase* Player)
+{
+	if (HasAuthority() && Player)
+	{
+		if (Player->GetCurrentWeapon() && Player->GetCurrentWeapon()->IsA(WeaponClass) && !Player->GetCurrentWeapon()->IsTotalAmmoFull())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Purchasing Ammo For: %s"), *Player->GetCurrentWeapon()->GetName());
+
+			if (AZombiesPlayerState* PState = Player->GetPlayerState<AZombiesPlayerState>())
+				if (!PState->DecrementPoints(AmmoCost))
+					return;
+
+			Player->GetCurrentWeapon()->RefillAmmo();
+			
+
+		}
+	}
+}
+
 void AWallWeapon::Use(ACharacterBase* Player)
 {
 	if (HasAuthority() && Player)
 	{
+
 		for (AWeaponBase* Weapon : *Player->GetWeaponArray())
 			if (Weapon)
-			    if (Weapon->IsA(WeaponClass)) return;
+				if (Weapon->IsA(WeaponClass))
+				{
+					PurchaseAmmo(Player);
+					return;
+				}
 			
 		if (AZombiesPlayerState* PState = Player->GetPlayerState<AZombiesPlayerState>())
 			if (!PState->DecrementPoints(Cost))

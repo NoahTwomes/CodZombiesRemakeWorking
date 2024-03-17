@@ -29,6 +29,7 @@ AWeaponBase::AWeaponBase()
 	bIsFiring = false;
 }
 
+
 // Called when the game starts or when spawned
 void AWeaponBase::BeginPlay()
 {
@@ -163,6 +164,7 @@ void AWeaponBase::Multi_Reload_Implementation()
 	}
 }
 
+
 bool AWeaponBase::Reload()
 {
 	if (CurrentTotalAmmo > 0 && CurrentMagazineAmmo != MagazineMaxAmmo)
@@ -206,6 +208,31 @@ TArray<int32> AWeaponBase::GetCurrentAmmo()
 	
 	return { CurrentMagazineAmmo, CurrentTotalAmmo };
 }
+
+void AWeaponBase::Client_RefillAmmo_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("CLIENT REFILL AMMO"))
+	RefillAmmo();
+}
+
+void AWeaponBase::RefillAmmo()
+{
+	if (ACharacterBase* Player = Cast<ACharacterBase>(GetOwner()))
+	{
+		CurrentTotalAmmo = WeaponMaxAmmo;
+		if (HasAuthority() && !Player->IsLocallyControlled())
+			Client_RefillAmmo();
+			
+		else
+		{
+			
+			UE_LOG(LogTemp, Warning, TEXT("Refresing Ammo Widget"))
+				Player->RefreshAmmoWidget();
+		}
+	}
+
+}
+
 
 UAnimMontage* AWeaponBase::GetFireAnimMontage()
 {
