@@ -21,6 +21,7 @@ protected:
 	uint8 ZombiesOnMap; //Set to replicate
 	uint16 TotalZombiesRemaining; //Set to replicate
 	float ZombieHealth;
+	bool HasIncreased;
 
 public:
 	uint16 GetRoundNumber();
@@ -31,4 +32,6 @@ public:
 	uint8 GetZombiesOnMap();
 	void ZombieSpawned();
 	float GetZombieHealth();
+	UFUNCTION(BlueprintCallable)
+	bool RoundHasIncreased();
 };

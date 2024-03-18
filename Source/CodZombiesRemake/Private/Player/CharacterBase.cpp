@@ -326,6 +326,7 @@ void ACharacterBase::Interact()
 			Server_Interact(Interactable);
 
 		Interactable = nullptr;
+		OnInteractChanged.Broadcast(FString());
 	}
 }
 

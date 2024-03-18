@@ -9,6 +9,7 @@ AZombiesGameState::AZombiesGameState()
 	ZombiesOnMap = 0;
 	TotalZombiesRemaining = 5;
 	ZombieHealth = 150;
+	HasIncreased = false;
 }
 
 uint16 AZombiesGameState::GetRoundNumber()
@@ -19,6 +20,7 @@ uint16 AZombiesGameState::GetRoundNumber()
 void AZombiesGameState::IncrementRoundNumber()
 {
 	++RoundNumber;
+	HasIncreased = true;
 	if (RoundNumber < 10)
 	{
 		ZombieHealth += 100;
@@ -27,6 +29,8 @@ void AZombiesGameState::IncrementRoundNumber()
 	{
 		ZombieHealth *= 1.1f;
 	}
+
+	
 }
 
 void AZombiesGameState::SetTotalZombiesRemaining(const uint16& ZombieCount)
@@ -60,4 +64,16 @@ void AZombiesGameState::ZombieSpawned()
 float AZombiesGameState::GetZombieHealth()
 {
 	return ZombieHealth;
+}
+
+bool AZombiesGameState::RoundHasIncreased()
+{
+	if (RoundNumber == 2)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
