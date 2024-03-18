@@ -45,11 +45,13 @@ protected:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void PostLogin(APlayerController* NewPlayer) override;
 
 	void SetSpawnPoints();
 
 public:
 	void NewZoneActive(uint8 ZoneNumber);
 	void ZombieKilled();
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+	UFUNCTION(BlueprintCallable)
+	void RespawnPlayer(AController* Controller);
 };

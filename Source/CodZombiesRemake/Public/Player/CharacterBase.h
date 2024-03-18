@@ -91,6 +91,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	class AWeaponBase* GetCurrentWeapon();
 
+	UFUNCTION(BlueprintCallable)
+	void Die();
+
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void MultiDie();
+	bool MultiDie_Validate();
+	void MultiDie_Implementation();
+
 public:
 	void GivePlayerWeapon(class AWeaponBase* Weapon);
 

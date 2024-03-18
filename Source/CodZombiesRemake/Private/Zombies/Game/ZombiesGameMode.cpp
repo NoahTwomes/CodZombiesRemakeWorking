@@ -113,6 +113,29 @@ void AZombiesGameMode::PostLogin(APlayerController* NewPlayer)
 
 }
 
+void AZombiesGameMode::RespawnPlayer(AController* Controller)
+{
+	UE_LOG(LogTemp, Warning, TEXT("RESPAWNED"))
+	for (AZombiesPlayerSpawnPoint* SpawnPoint : PlayerSpawnPoints)
+	{
+		if (Controller)
+		{
+			if (!SpawnPoint->IsUsed())
+			{
+				FVector SpawnLocation = SpawnPoint->GetActorLocation();
+				if (APawn* Pawn = GetWorld()->SpawnActor<APawn>(PlayerClass, SpawnLocation, FRotator::ZeroRotator))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Spawned Pawn to possess"));
+					Controller->Possess(Pawn);
+					SpawnPoint->SetUsed(false);
+					return;
+				}
+			}
+		}
+
+	}
+}
+
 
 void AZombiesGameMode::NewZoneActive(uint8 ZoneNumber)
 {

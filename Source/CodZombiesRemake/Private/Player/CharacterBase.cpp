@@ -16,6 +16,7 @@
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
 #include "Net/UnrealNetwork.h"
+#include <Zombies/Game/ZombiesGameMode.h>
 
 
 
@@ -64,6 +65,7 @@ AWeaponBase* ACharacterBase::GetCurrentWeapon()
 {
 	return CurrentWeapon;
 }
+
 
 
 // Called when the game starts or when spawned
@@ -354,13 +356,13 @@ void ACharacterBase::SetInteractableObject()
 	CollisionParams.AddIgnoredActor(this);
 	GetWorld()->LineTraceSingleByObjectType(OUT HitResult, Start, End, CollisionQuery, CollisionParams);
 
-	AInteractableBase * Temp = Cast<AInteractableBase>(HitResult.GetActor());
+	AInteractableBase* Temp = Cast<AInteractableBase>(HitResult.GetActor());
 	if (Interactable == nullptr && Temp)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("IS NOW A VALID PTR"));
 		Interactable = Temp;
 		OnInteractChanged.Broadcast(Interactable->GetUIMessage(this));
-	
+
 	}
 
 	else if (Interactable && Temp == nullptr)
@@ -375,14 +377,61 @@ void ACharacterBase::SetInteractableObject()
 	if (Temp)
 	{
 		Interactable = Temp;
-		
+
 	}
 	else
 	{
 		Interactable = nullptr;
-	
+
 	}
 }
+
+void ACharacterBase::Die()
+{
+	
+		if (WeaponArray.Num() >= 2)
+		{
+
+			WeaponArray.Remove(CurrentWeapon);
+			SwitchNextWeapon();
+			WeaponArray.Remove(CurrentWeapon);
+		}
+
+		if (WeaponArray.Num() <= 1)
+		{
+
+			WeaponArray.Remove(CurrentWeapon);
+			
+		}
+
+		
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+
+		CurrentWeapon = GetWorld()->SpawnActor<AWeaponBase>(StartingWeaponClass, SpawnParams);
+		if (CurrentWeapon)
+		{
+		
+			WeaponArray.Add(CurrentWeapon);
+			OnRep_AttachWeapon();
+			UE_LOG(LogTemp, Warning, TEXT("THIS WORKED"));
+
+		}
+	
+}
+
+
+bool ACharacterBase::MultiDie_Validate()
+{
+	return false;
+}
+
+void ACharacterBase::MultiDie_Implementation()
+{
+	
+}
+
+
 
 void ACharacterBase::GivePlayerWeapon(AWeaponBase* Weapon)
 {

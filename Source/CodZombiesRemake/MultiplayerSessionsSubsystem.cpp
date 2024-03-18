@@ -123,7 +123,7 @@ void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, b
 
 	if (WasSuccessful)
 	{
-		GetWorld()->ServerTravel("/Game/_GENERATED/BackroomsLevel0?listen");
+		GetWorld()->ServerTravel("/Game/Maps/NaziZombies/Nacht_der_Untoten/map_Nacht_der_Untoten?listen");
 	}
 }
 
