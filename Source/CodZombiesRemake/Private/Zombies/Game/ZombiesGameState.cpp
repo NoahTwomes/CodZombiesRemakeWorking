@@ -77,3 +77,8 @@ bool AZombiesGameState::RoundHasIncreased()
 		return true;
 	}
 }
+
+int32 AZombiesGameState::CurrentRound()
+{
+	return RoundNumber;
+}

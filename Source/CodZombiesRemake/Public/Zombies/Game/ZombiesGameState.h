@@ -34,4 +34,6 @@ public:
 	float GetZombieHealth();
 	UFUNCTION(BlueprintCallable)
 	bool RoundHasIncreased();
+	UFUNCTION(BlueprintCallable)
+	int32 CurrentRound();
 };

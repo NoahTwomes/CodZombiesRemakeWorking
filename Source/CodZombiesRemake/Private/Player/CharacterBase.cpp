@@ -152,7 +152,7 @@ void ACharacterBase::OnRep_AttachWeapon()
 		if (true || IsLocallyControlled())
 		{
 
-			CurrentWeapon->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("s_weaponSocket"));
+			CurrentWeapon->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("s_weaponSocket2"));
 			UE_LOG(LogTemp, Warning, TEXT("SPAWNED AND ATTEMPTED TO ATTACH WEAPON TO HAND LOCALLY"));
 			TArray<int32> CurrentAmmo = CurrentWeapon->GetCurrentAmmo();
 			OnAmmoChanged.Broadcast(CurrentAmmo[0], CurrentAmmo[1]);
