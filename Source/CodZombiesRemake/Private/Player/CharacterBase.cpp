@@ -48,7 +48,8 @@ ACharacterBase::ACharacterBase()
 
 	Interactable = nullptr;
 	InteractionRange = 200.0f;
-
+	Health = 150;
+	MaxHealth = 150;
 
 	WeaponIndex = 0;
 

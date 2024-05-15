@@ -88,6 +88,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool GetIsAiming();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float Health;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float MaxHealth;
+
 	UFUNCTION(BlueprintCallable)
 	class AWeaponBase* GetCurrentWeapon();
 
