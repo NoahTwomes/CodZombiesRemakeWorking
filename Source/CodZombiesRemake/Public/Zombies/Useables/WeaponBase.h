@@ -91,7 +91,8 @@ protected:
 	UPROPERTY(Replicated)
 	int32 CurrentMagazineAmmo;
 
-
+	UPROPERTY()
+	int i;
 
 
 protected:
@@ -100,6 +101,9 @@ protected:
 
 	TArray<FHitResult> PerformLineTrace(class ACharacterBase* ShootingPlayer);
 	TArray<FHitResult> PerformLineTrace(FVector MuzzleLocation, FRotator MuzzleRotation);
+	TArray<FHitResult> PerformLineTraceShotgun(class ACharacterBase* ShootingPlayer);
+
+	void Loop();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_Fire(const TArray<FHitResult>& HitResults);

@@ -18,11 +18,13 @@
 AZombiesGameMode::AZombiesGameMode()
 {
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/BlueprintClasses/Player/BP_CharacterBase.BP_CharacterBase_C"));
-	DefaultPawnClass = PlayerPawnClassFinder.Class;
+	//DefaultPawnClass = PlayerPawnClassFinder.Class;
 
 	bHasLoadedSpawnPoints = false;
 
 	ZombiesRemaining = 0;
+
+	PlayersAlive = 0;
 
 
 }
@@ -91,6 +93,8 @@ void AZombiesGameMode::SetSpawnPoints()
 void AZombiesGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
+
+	PlayersAlive++;
 
 
 	if (bHasLoadedSpawnPoints == false)

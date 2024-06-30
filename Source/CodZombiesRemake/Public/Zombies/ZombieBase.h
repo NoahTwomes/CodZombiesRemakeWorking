@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "ZombieBase.generated.h"
 
+class UNiagaraSystem;
+
 UCLASS()
 class CODZOMBIESREMAKE_API AZombieBase : public ACharacter
 {
@@ -21,6 +23,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	float CleanupDelay;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	UNiagaraSystem* NS_Blood;
 
 	UPROPERTY(ReplicatedUsing = OnRep_Die, EditAnywhere)
 	bool bIsDead;
@@ -39,5 +44,6 @@ protected:
 
 public:
 	void Hit(class ACharacterBase* Player, FHitResult HitResult);
+	void XPOnKill(ACharacterBase* Player);
 
 };

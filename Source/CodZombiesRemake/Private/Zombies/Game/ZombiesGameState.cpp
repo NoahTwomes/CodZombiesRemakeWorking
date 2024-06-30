@@ -2,10 +2,14 @@
 
 
 #include "Zombies/Game/ZombiesGameState.h"
+#include <Net/UnrealNetwork.h>
+#include <Player/ZombiesPlayerState.h>
+#include <Player/CharacterBase.h>
 
 AZombiesGameState::AZombiesGameState()
 {
 	RoundNumber = 1;
+	HudNumber = 1;
 	ZombiesOnMap = 0;
 	TotalZombiesRemaining = 5;
 	ZombieHealth = 150;
@@ -20,6 +24,7 @@ uint16 AZombiesGameState::GetRoundNumber()
 void AZombiesGameState::IncrementRoundNumber()
 {
 	++RoundNumber;
+	++HudNumber;
 	HasIncreased = true;
 	if (RoundNumber < 10)
 	{
@@ -76,6 +81,14 @@ bool AZombiesGameState::RoundHasIncreased()
 	{
 		return true;
 	}
+}
+
+void AZombiesGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	DOREPLIFETIME(AZombiesGameState, HudNumber);
+
 }
 
 int32 AZombiesGameState::CurrentRound()

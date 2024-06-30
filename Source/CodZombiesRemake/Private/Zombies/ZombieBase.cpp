@@ -8,7 +8,7 @@
 #include "Zombies/Game/ZombiesGameState.h"
 #include "Zombies/Useables/WeaponBase.h"
 
-
+#include "NiagaraFunctionLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "TimerManager.h"
@@ -94,7 +94,6 @@ void AZombieBase::Die()
 {
 	if (HasAuthority())
 	{
-	
 		//get game mode and decrementation
 		if (AZombiesGameMode* GM = GetWorld()->GetAuthGameMode<AZombiesGameMode>())
 		{
@@ -102,28 +101,39 @@ void AZombieBase::Die()
 		}
 		bIsDead = true;
 		OnRep_Die();
+		
 	}
+
+	if (ACharacterBase* Player = Cast<ACharacterBase>(GetOwner()))
+	{
+		XPOnKill(Player);
+	}
+}
+
+void AZombieBase::XPOnKill(ACharacterBase* Player)
+{
+
 }
 
 uint8 AZombieBase::GetHitPart(FString BoneName)
 {
-	if (BoneName.Contains(FString("l")) || BoneName.Contains(FString("r")))
+	if (BoneName.Contains(FString("L")) || BoneName.Contains(FString("R")))
 	{ //limbHit
 
 		
 		return 1;
 	}
-	else if (BoneName.Contains(FString("spine")) || BoneName.Contains(FString("pelvis")))
+	else if (BoneName.Contains(FString("Spine")) || BoneName.Contains(FString("Pelvis")))
 	{ //torsoHit
 		
 		return 2;
 	}
-	else if (BoneName.Equals(FString("neck_01")))
+	else if (BoneName.Equals(FString("Neck")))
 	{ //Neck Hit
 		
 		return 3;
 	}
-	else if (BoneName.Equals(FString("head")))
+	else if (BoneName.Equals(FString("Head")))
 	{ //Head hit
 		
 		return 4;
@@ -157,6 +167,8 @@ uint8 AZombieBase::GetPointsForHit(uint8 HitPart, float Damage)
 
 void AZombieBase::Hit(ACharacterBase* Player,FHitResult HitResult)
 {
+	FVector BloodLocation = HitResult.ImpactPoint;
+
 	if (Player)
 	{
 		if (AZombiesPlayerState* PState = Player->GetPlayerState<AZombiesPlayerState>())
@@ -186,9 +198,21 @@ void AZombieBase::Hit(ACharacterBase* Player,FHitResult HitResult)
 						{
 
 							PState->IncrementPoints(PointsForHit);
+							PState->IncrementXP(PointsForHit);
 						}
 
+						if (NS_Blood)
+						{
+							UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Blood, BloodLocation);
+						}
+						
+
 					}
+				}
+				if (PState->XP >= PState->XPRequired)
+				{
+					PState->IncrementLevel();
+					PState->IncrementXPRequired();
 				}
 			
 		}

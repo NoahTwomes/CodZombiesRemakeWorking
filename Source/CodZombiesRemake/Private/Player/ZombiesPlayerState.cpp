@@ -9,6 +9,9 @@
 AZombiesPlayerState::AZombiesPlayerState()
 {
 	Points = 500;
+	XP = 0;
+	Level = 0;
+	XPRequired = 250;
 }
 
 
@@ -17,6 +20,7 @@ void AZombiesPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AZombiesPlayerState, Points);
+	DOREPLIFETIME(AZombiesPlayerState, XP);
 }
 
 void AZombiesPlayerState::OnRep_PointsChanged()
@@ -54,4 +58,23 @@ bool AZombiesPlayerState::DecrementPoints(uint16 Value)
 	
 	return true;
 
+}
+
+void AZombiesPlayerState::IncrementXP(uint16 Value)
+{
+	XP += Value;
+	//if (HasAuthority())
+	UE_LOG(LogTemp, Warning, TEXT("XP: %d"), XP);
+}
+
+void AZombiesPlayerState::IncrementLevel()
+{
+	++ Level;
+	if (HasAuthority())
+		UE_LOG(LogTemp, Warning, TEXT("XP: %d"), XP);
+}
+
+void AZombiesPlayerState::IncrementXPRequired()
+{
+	XPRequired *= 2;
 }

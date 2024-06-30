@@ -94,6 +94,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float MaxHealth;
 
+	UPROPERTY(BlueprintReadWrite)
+	float XP;
+
+	UPROPERTY()
+	int32 Level;
+
+	UPROPERTY()
+	bool HasPerk1;
+
 	UFUNCTION(BlueprintCallable)
 	class AWeaponBase* GetCurrentWeapon();
 

@@ -21,12 +21,28 @@ protected:
 
 	UPROPERTY(ReplicatedUsing = OnRep_PointsChanged, EditDefaultsOnly) //set to replicate MOVE TO PLAYER STATE WHEN CREATED
 		int32 Points;
+
+
 	UFUNCTION()
 	void OnRep_PointsChanged();
 
 public:
 	void IncrementPoints(uint16 Value);
 	bool DecrementPoints(uint16 Value);
+
+	void IncrementXP(uint16 Value);
+
+	void IncrementLevel();
+	void IncrementXPRequired();
+
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	float XP;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 Level;
+
+	UPROPERTY(BlueprintReadWrite)
+	float XPRequired;
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetPoints();

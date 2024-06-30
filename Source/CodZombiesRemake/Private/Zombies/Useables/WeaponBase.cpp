@@ -9,6 +9,9 @@
 #include "DrawDebugHelpers.h"
 #include "Animation/AnimInstance.h"
 #include "Net/UnrealNetwork.h"
+#include "Math/UnrealMathUtility.h"
+#include "Kismet/KismetMathLibrary.h"
+
 
 // Sets default values
 AWeaponBase::AWeaponBase()
@@ -81,6 +84,49 @@ TArray<FHitResult> AWeaponBase::PerformLineTrace(FVector MuzzleLocation, FRotato
 	DrawDebugLine(GetWorld(), MuzzleLocation, End, FColor::Red, false, 2.0f, 0, 3.0f);
 	GetWorld()->LineTraceMultiByChannel(OUT HitResults, MuzzleLocation, End, ECollisionChannel::ECC_GameTraceChannel2, CollisionParams, CollisionResponse);
 	return HitResults;
+}
+
+TArray<FHitResult> AWeaponBase::PerformLineTraceShotgun(ACharacterBase* ShootingPlayer)
+{
+	TArray<FHitResult> AllHitResults;
+
+	for (i = 0; i <= 1; i++)
+	{
+
+
+
+		FVector Start = WeaponMesh->GetSocketLocation(FName("muzzleSocket"));
+		FVector Rot = WeaponMesh->GetSocketRotation(FName("muzzleSocket")).Vector();
+		const int32 min = -100;
+		const int32 max = 100;
+		FVector End = Start + Rot * 1000.0f;
+		End.X += FMath::RandRange(min, max);
+		End.Y += FMath::RandRange(min, max);
+		End.Z +=FMath::RandRange(min, max);
+
+
+		TArray<FHitResult> HitResults;
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(this);
+		CollisionParams.AddIgnoredActor(ShootingPlayer);
+
+		FCollisionResponseParams CollisionResponse;
+
+
+
+
+		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.0f, 0, 3.0f);
+		GetWorld()->LineTraceMultiByChannel(OUT HitResults, Start, End, ECollisionChannel::ECC_GameTraceChannel2, CollisionParams, CollisionResponse);
+		AllHitResults.Append(HitResults);
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("BLAST WORKED"));
+	return AllHitResults;
+}
+
+void AWeaponBase::Loop()
+{
+	
 }
 
 bool AWeaponBase::Server_Fire_Validate(const TArray<FHitResult>& HitResults)

@@ -26,6 +26,9 @@ protected:
 
 	TArray<class AZombiesZombieSpawnPoint*> ZombieSpawnPoints;
 
+	UPROPERTY(BlueprintReadWrite)
+	int PlayersAlive;
+
 
 	UPROPERTY(EditAnywhere, Category = "ZombiesSettings")
 	TSubclassOf<class ACharacterBase> PlayerClass;

@@ -16,6 +16,7 @@ ABarricade::ABarricade()
 	RootComponent = MeshComp;
 
 	CollisionMesh = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
+	CollisionMesh->SetupAttachment(MeshComp);
 	
 	Cost = 500;
 	AccessZone = 0;
@@ -29,7 +30,6 @@ ABarricade::ABarricade()
 void ABarricade::BeginPlay()
 {
 	Super::BeginPlay();
-	SetReplicates(true);
 	
 }
 

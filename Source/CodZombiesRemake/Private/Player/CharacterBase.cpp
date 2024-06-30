@@ -54,6 +54,9 @@ ACharacterBase::ACharacterBase()
 	WeaponIndex = 0;
 
 	bIsAiming = false;
+	HasPerk1 = false;
+
+	XP = 0.0f;
 
 }
 
@@ -126,6 +129,9 @@ void ACharacterBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& Out
 	DOREPLIFETIME_CONDITION(ACharacterBase, WeaponIndex, COND_OwnerOnly);
 	DOREPLIFETIME(ACharacterBase, WeaponArray);
 	DOREPLIFETIME_CONDITION(ACharacterBase, bIsAiming, COND_SkipOwner);
+
+	
+
 }
 
 bool ACharacterBase::Server_SwtichWeapon_Validate(AWeaponBase* NewWeapon, int32 NewWeaponIndex)

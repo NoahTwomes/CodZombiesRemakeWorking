@@ -18,9 +18,12 @@ public:
 
 protected:
 	uint16 RoundNumber; //set to replicate
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	int32 HudNumber;
 	uint8 ZombiesOnMap; //Set to replicate
 	uint16 TotalZombiesRemaining; //Set to replicate
 	float ZombieHealth;
+	UPROPERTY(BlueprintReadWrite)
 	bool HasIncreased;
 
 public:
@@ -34,6 +37,9 @@ public:
 	float GetZombieHealth();
 	UFUNCTION(BlueprintCallable)
 	bool RoundHasIncreased();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	UFUNCTION(BlueprintCallable)
 	int32 CurrentRound();
 };

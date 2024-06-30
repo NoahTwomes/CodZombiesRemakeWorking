@@ -9,6 +9,7 @@ AInteractableBase::AInteractableBase()
 	ObjectName = "Default";
 	UIMessage = "Press F to buy ";
 	
+	SetReplicates(true);
 }
 
 // Called when the game starts or when spawned

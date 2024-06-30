@@ -37,6 +37,14 @@ protected:
 
 public:
 	virtual FString GetUIMessage(class ACharacterBase* Player) override;
+	UFUNCTION(BlueprintCallable)
 	virtual void Use(class ACharacterBase* Player) override;
-
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_use(class ACharacterBase* Player);
+	bool Multi_use_Validate(class ACharacterBase* Player);
+	void Multi_use_Implementation(class ACharacterBase* Player);
+	UFUNCTION(Server, Reliable)
+	void Server_use(class ACharacterBase* Player);
+	bool Server_use_Validate(class ACharacterBase* Player);
+	void Server_use_Implementation(class ACharacterBase* Player);
 };
