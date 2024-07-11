@@ -103,6 +103,27 @@ public:
 	UPROPERTY()
 	bool HasPerk1;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float WalkSpeed;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float RunSpeed;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float MaxStamina;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float CurrentStamina;
+
+	UPROPERTY()
+	bool StaminaGain;
+
+	UPROPERTY()
+	bool StaminaReduce;
+
+	UPROPERTY()
+	bool bIsSprinting;
+
 	UFUNCTION(BlueprintCallable)
 	class AWeaponBase* GetCurrentWeapon();
 
@@ -130,6 +151,19 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	float InteractionRange;
 
+	UFUNCTION(BlueprintCallable)
+	void Sprint();
+
+	UFUNCTION(BlueprintCallable)
+	void Walk();
+
+	FTimerHandle StaminaGainTimerHandle;
+	FTimerHandle StaminaReduceTimerHandle;
+
+
+	void StaminaGainFunction();
+	void StaminaReduceFunction();
+	void TimerHandles();
 
 
 protected:

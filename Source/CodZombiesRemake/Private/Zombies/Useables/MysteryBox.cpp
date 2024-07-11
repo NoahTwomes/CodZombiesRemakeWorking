@@ -3,6 +3,7 @@
 
 #include "Zombies/Useables/MysteryBox.h"
 #include "Zombies/Useables/WeaponBase.h"
+#include "Player/CharacterBase.h"
 
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -115,8 +116,7 @@ void AMysteryBox::Use(ACharacterBase* Player)
 		bCanUseBox = false;
 		uint8 RandomIndex = FMath::RandRange(0, BoxWeaponArray.Num());
 		UE_LOG(LogTemp, Warning, TEXT("Weapon Count In Box: %d"), BoxWeaponArray.Num());
-		Multi_BoxUsed(RandomIndex);
-		if (OpenAnimation)
-			MysteryBoxMesh->PlayAnimation(OpenAnimation, false);
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = Player;
 	}
 }

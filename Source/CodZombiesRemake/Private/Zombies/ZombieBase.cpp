@@ -20,7 +20,7 @@ AZombieBase::AZombieBase()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	Health = 150;
 	bIsDead = false;
-	CleanupDelay = 5.0f;
+	CleanupDelay = 250.0f;
 }
 
 
@@ -205,6 +205,14 @@ void AZombieBase::Hit(ACharacterBase* Player,FHitResult HitResult)
 						{
 							UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Blood, BloodLocation);
 						}
+
+						if (HitLocation != Torso && Health <= 50)
+						{
+							GetMesh()->HideBone(GetMesh()->GetBoneIndex(FName(BoneName)), PBO_None);
+						}
+						
+							
+						
 						
 
 					}

@@ -3,6 +3,7 @@
 
 #include "Zombies/Useables/RandomUpgradeMachine.h"
 #include "Player/CharacterBase.h"
+#include "CharacterMovementComponent.generated.h"
 
 #include "Components/StaticMeshComponent.h"
 #include "Math/UnrealMathUtility.h"
@@ -57,11 +58,14 @@ void ARandomUpgradeMachine::Use(ACharacterBase* Player)
 
 void ARandomUpgradeMachine::ability1(ACharacterBase* Player)
 {
+	Player->WalkSpeed += 10.0f;
+	Player->RunSpeed += 10.0f;
 	UE_LOG(LogTemp, Warning, TEXT("Ability 1"));
 }
 
 void ARandomUpgradeMachine::ability2(ACharacterBase* Player)
 {
+	
 	UE_LOG(LogTemp, Warning, TEXT("Ability 2"));
 }
 

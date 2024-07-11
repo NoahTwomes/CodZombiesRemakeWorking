@@ -12,6 +12,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Zombies/Useables/InteractableBase.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
@@ -58,6 +59,14 @@ ACharacterBase::ACharacterBase()
 
 	XP = 0.0f;
 
+	WalkSpeed = 500.0f;
+	RunSpeed = 1000.0f;
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+
+	MaxStamina = 500.0f;
+	CurrentStamina = MaxStamina;
+	StaminaGain = false;
+	StaminaReduce = false;
 }
 
 bool ACharacterBase::GetIsAiming()
@@ -77,7 +86,7 @@ void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 
 
 	//Add Input Mapping Context
@@ -267,6 +276,9 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACharacterBase::Look);
 
+		PlayerInputComponent->BindAction("Run", IE_Pressed, this, &ACharacterBase::Sprint);
+		PlayerInputComponent->BindAction("Run", IE_Released, this, &ACharacterBase::Walk);
+
 		PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ACharacterBase::Interact);
 
 		PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ACharacterBase::OnFire);
@@ -320,6 +332,64 @@ bool  ACharacterBase::GetHasRifle()
 }
 
 
+
+void ACharacterBase::Sprint()
+{
+	if (CurrentStamina > 0)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
+		StaminaGain = false;
+		StaminaReduce = true;
+		TimerHandles();
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	}
+
+}
+
+void ACharacterBase::Walk()
+{
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	StaminaGain = true;
+	StaminaReduce = false;
+	TimerHandles();
+}
+
+void ACharacterBase::StaminaGainFunction()
+{
+	if (CurrentStamina < MaxStamina)
+	{
+		CurrentStamina += 1;
+
+
+	}
+	else
+	{
+		StaminaGain = false;
+	}
+}
+
+void ACharacterBase::StaminaReduceFunction()
+{
+	if (CurrentStamina > 0)
+	{
+		CurrentStamina -= 1;
+	}
+	else
+	{
+		StaminaReduce = false;
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+
+	}
+}
+
+void ACharacterBase::TimerHandles()
+{
+	GetWorld()->GetTimerManager().SetTimer(StaminaGainTimerHandle, this, &ACharacterBase::StaminaGainFunction, 0.01f, StaminaGain);
+	GetWorld()->GetTimerManager().SetTimer(StaminaReduceTimerHandle, this, &ACharacterBase::StaminaReduceFunction, 0.01f, StaminaReduce);
+}
 
 void ACharacterBase::Interact()
 {
