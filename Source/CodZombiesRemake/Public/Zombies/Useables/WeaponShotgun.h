@@ -16,16 +16,4 @@ class CODZOMBIESREMAKE_API AWeaponShotgun : public AWeaponBase
 
 public:
 	AWeaponShotgun();
-
-
-protected:
-	virtual void BeginPlay() override;
-	virtual void Server_Fire_Implementation(const TArray<FHitResult>& HitResults) override;
-	virtual void Multi_Fire_Implementation(const FHitResult& HitResult) override;
-
-
-public:
-	virtual bool Fire(class ACharacterBase* ShootingPlayer) override;
-	virtual bool Reload() override;
-	
 };

@@ -30,6 +30,7 @@ AWeaponBase::AWeaponBase()
 	CurrentTotalAmmo = WeaponMaxAmmo;
 	CurrentMagazineAmmo = MagazineMaxAmmo;
 	bIsFiring = false;
+
 }
 
 
@@ -86,43 +87,7 @@ TArray<FHitResult> AWeaponBase::PerformLineTrace(FVector MuzzleLocation, FRotato
 	return HitResults;
 }
 
-TArray<FHitResult> AWeaponBase::PerformLineTraceShotgun(ACharacterBase* ShootingPlayer)
-{
-	TArray<FHitResult> AllHitResults;
 
-	for (i = 0; i <= 1; i++)
-	{
-
-
-
-		FVector Start = WeaponMesh->GetSocketLocation(FName("muzzleSocket"));
-		FVector Rot = WeaponMesh->GetSocketRotation(FName("muzzleSocket")).Vector();
-		const int32 min = -100;
-		const int32 max = 100;
-		FVector End = Start + Rot * 1000.0f;
-		End.X += FMath::RandRange(min, max);
-		End.Y += FMath::RandRange(min, max);
-		End.Z +=FMath::RandRange(min, max);
-
-
-		TArray<FHitResult> HitResults;
-		FCollisionQueryParams CollisionParams;
-		CollisionParams.AddIgnoredActor(this);
-		CollisionParams.AddIgnoredActor(ShootingPlayer);
-
-		FCollisionResponseParams CollisionResponse;
-
-
-
-
-		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.0f, 0, 3.0f);
-		GetWorld()->LineTraceMultiByChannel(OUT HitResults, Start, End, ECollisionChannel::ECC_GameTraceChannel2, CollisionParams, CollisionResponse);
-		AllHitResults.Append(HitResults);
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("BLAST WORKED"));
-	return AllHitResults;
-}
 
 void AWeaponBase::Loop()
 {
@@ -145,20 +110,31 @@ void AWeaponBase::Server_Fire_Implementation(const TArray<FHitResult>& HitResult
 
 bool AWeaponBase::Fire(ACharacterBase* ShootingPlayer)
 {
-	if (CurrentMagazineAmmo > 0)
-	--CurrentMagazineAmmo;
-	UE_LOG(LogTemp, Warning, TEXT("ClientAmmo: %d"), CurrentMagazineAmmo);
-	return true;
+	
+	
+		if (CurrentMagazineAmmo > 0)
+			--CurrentMagazineAmmo;
+		UE_LOG(LogTemp, Warning, TEXT("ClientAmmo: %d"), CurrentMagazineAmmo);
+		return true;
+
+	
 }
 
 void AWeaponBase::StopFiring()
 {
-
+	UE_LOG(LogTemp, Warning, TEXT("Stop Firing"));
+	bIsFiring = false;
+	
 }
 
 FWeaponDamage AWeaponBase::GetWeaponDamage()
 {
 	return WeaponDamage;
+}
+
+FWeaponDamage AWeaponBase::GetUpgradedWeaponDamage()
+{
+	return UpgradedWeaponDamage;
 }
 
 bool AWeaponBase::Multi_Fire_Validate(const FHitResult& HitResult)
@@ -220,9 +196,11 @@ bool AWeaponBase::Reload()
 			if (Pawn->IsLocallyControlled() && ReloadAnimation)
 			{
 				WeaponMesh->PlayAnimation(ReloadAnimation, false);
-
+				StopFiring();
+				
 			}
 		}
+	
 		
 
 		int Difference = MagazineMaxAmmo - CurrentMagazineAmmo;

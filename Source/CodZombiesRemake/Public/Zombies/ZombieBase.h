@@ -27,6 +27,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	UNiagaraSystem* NS_Blood;
 
+	UPROPERTY(EditAnywhere, Category = "Blood")
+	TSubclassOf<class AActor> BloodBP;
+
+
 	UPROPERTY(ReplicatedUsing = OnRep_Die, EditAnywhere)
 	bool bIsDead;
 	UFUNCTION()
@@ -45,5 +49,19 @@ protected:
 public:
 	void Hit(class ACharacterBase* Player, FHitResult HitResult);
 	void XPOnKill(ACharacterBase* Player);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_HeadEffect();
+	bool Multi_HeadEffect_Validate();
+	void Multi_HeadEffect_Implementation();
 
+	UPROPERTY(EditAnywhere,Category="Audio")
+	USoundBase* SoundToPlay;
+	UPROPERTY(EditAnywhere)
+	float Speed;
+	UPROPERTY(EditAnywhere, Category = "GIB")
+	USkinnedAsset* TorsoMesh;
+	UPROPERTY(EditAnywhere, Category = "GIB")
+	USkinnedAsset* HeadMesh;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VFX")
+	UParticleSystem* GibBlood;
 };

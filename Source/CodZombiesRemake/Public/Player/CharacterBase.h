@@ -88,6 +88,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool GetIsAiming();
 
+	UPROPERTY()
+	bool upgraded;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float Health;
 

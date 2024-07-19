@@ -117,6 +117,7 @@ void AZombiesGameMode::PostLogin(APlayerController* NewPlayer)
 
 }
 
+
 void AZombiesGameMode::RespawnPlayer(AController* Controller)
 {
 	UE_LOG(LogTemp, Warning, TEXT("RESPAWNED"))
@@ -237,6 +238,7 @@ void AZombiesGameMode::ZombieKilled()
 			ZombieGameState->IncrementRoundNumber();
 			FTimerHandle TempHandle;
 			GetWorld()->GetTimerManager().SetTimer(TempHandle, this, &AZombiesGameMode::CalculateZombieCount, 5.0f, false);
+			UGameplayStatics::PlaySound2D(this, SoundToPlay, 8.0f, 8.0f, 0.0f);
 		
 
 		}

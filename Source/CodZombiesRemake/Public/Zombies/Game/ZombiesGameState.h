@@ -23,6 +23,7 @@ protected:
 	uint8 ZombiesOnMap; //Set to replicate
 	uint16 TotalZombiesRemaining; //Set to replicate
 	float ZombieHealth;
+	float NewSpeed;
 	UPROPERTY(BlueprintReadWrite)
 	bool HasIncreased;
 
@@ -35,10 +36,14 @@ public:
 	uint8 GetZombiesOnMap();
 	void ZombieSpawned();
 	float GetZombieHealth();
+	float GetZombieSpeed();
 	UFUNCTION(BlueprintCallable)
 	bool RoundHasIncreased();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	USoundBase* SoundToPlay;
 
 	UFUNCTION(BlueprintCallable)
 	int32 CurrentRound();

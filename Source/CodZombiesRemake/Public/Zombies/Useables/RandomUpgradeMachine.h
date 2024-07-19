@@ -34,10 +34,13 @@ protected:
 
 public:
 	virtual FString GetUIMessage(class ACharacterBase* Player) override;
+	
+
 	UFUNCTION(BlueprintCallable)
 	virtual void Use(class ACharacterBase* Player) override;
 
 	void ability1(class ACharacterBase* Player);
 	void ability2(class ACharacterBase* Player);
 	void ability3(class ACharacterBase* Player);
+	void ability4(class ACharacterBase* Player);
 };

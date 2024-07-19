@@ -20,7 +20,7 @@ struct FWeaponDamage
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	float BaseDamage = 20.0f;
 	UPROPERTY(EditDefaultsOnly)
 	float HeadMultiplier = 3.5f;
@@ -77,14 +77,12 @@ protected:
 	FString WeaponName;
 
 	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
-	FWeaponDamage WeaponDamage;
-
-	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
 	int32 WeaponMaxAmmo;
 
 	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
 	int32 MagazineMaxAmmo;
 
+	FTimerHandle WeaponFireHandle;
 
 	UPROPERTY(Replicated)
 	int32 CurrentTotalAmmo;
@@ -101,8 +99,6 @@ protected:
 
 	TArray<FHitResult> PerformLineTrace(class ACharacterBase* ShootingPlayer);
 	TArray<FHitResult> PerformLineTrace(FVector MuzzleLocation, FRotator MuzzleRotation);
-	TArray<FHitResult> PerformLineTraceShotgun(class ACharacterBase* ShootingPlayer);
-
 	void Loop();
 
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -132,11 +128,19 @@ protected:
 private:
 	bool bIsFiring;
 
+
 public:	
 	virtual bool Fire(class ACharacterBase* ShootingPlayer);
 	virtual void StopFiring();
 	FWeaponDamage GetWeaponDamage();
+	FWeaponDamage GetUpgradedWeaponDamage();
 	virtual bool IsFiring() { return false; }
+
+	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
+	FWeaponDamage WeaponDamage;
+
+	UPROPERTY(EditAnywhere, Category = "Zombies Settings")
+	FWeaponDamage UpgradedWeaponDamage;
 
 	virtual bool Reload();
 

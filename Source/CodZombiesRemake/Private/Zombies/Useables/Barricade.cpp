@@ -45,6 +45,7 @@ void ABarricade::OnRep_BarricadeUsed()
 	CollisionMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	if (OpenAnimation)
 	MeshComp->PlayAnimation(OpenAnimation, false);
+	Destroy();
 }
 
 

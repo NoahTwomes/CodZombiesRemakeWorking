@@ -58,6 +58,7 @@ ACharacterBase::ACharacterBase()
 	HasPerk1 = false;
 
 	XP = 0.0f;
+	upgraded = false;
 
 	WalkSpeed = 500.0f;
 	RunSpeed = 1000.0f;

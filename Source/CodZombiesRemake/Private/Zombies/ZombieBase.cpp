@@ -11,8 +11,11 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "TimerManager.h"
 #include "Net/UnrealNetwork.h"
+#include <Kismet/GameplayStatics.h>
+#include <Kismet/KismetSystemLibrary.h>
 
 // Sets default values
 AZombieBase::AZombieBase()
@@ -21,6 +24,7 @@ AZombieBase::AZombieBase()
 	Health = 150;
 	bIsDead = false;
 	CleanupDelay = 250.0f;
+	Speed = 500.0f;
 }
 
 
@@ -36,12 +40,14 @@ void AZombieBase::BeginPlay()
 		if (AZombiesGameState* GS = GetWorld()->GetGameState<AZombiesGameState>())
 		{
 			Health = GS->GetZombieHealth();
+			Speed = GS->GetZombieSpeed();
 
 
 			UE_LOG(LogTemp, Warning, TEXT("Zombie Health: %f"),Health);
 		}
 	}
 	
+	GetCharacterMovement()->MaxWalkSpeed = Speed;
 }
 
 
@@ -115,25 +121,41 @@ void AZombieBase::XPOnKill(ACharacterBase* Player)
 
 }
 
+bool AZombieBase::Multi_HeadEffect_Validate()
+{
+	return true;
+}
+
+void AZombieBase::Multi_HeadEffect_Implementation()
+{
+	FVector Location(0.0f, 0.0f, 0.0f);
+	FRotator Rotation(0.0f, 0.0f, 0.0f);
+	FVector Scale(3.0f);
+
+	GetMesh()->SetSkinnedAssetAndUpdate(HeadMesh, true);
+	UGameplayStatics* SpawnEmitter;
+	SpawnEmitter->SpawnEmitterAttached(GibBlood, GetMesh(), "GIBS_HEAD_LOWER", Location, Rotation, Scale, EAttachLocation::KeepRelativeOffset);
+}
+
 uint8 AZombieBase::GetHitPart(FString BoneName)
 {
-	if (BoneName.Contains(FString("L")) || BoneName.Contains(FString("R")))
+	if (BoneName.Contains(FString("l")) || BoneName.Contains(FString("r")))
 	{ //limbHit
 
 		
 		return 1;
 	}
-	else if (BoneName.Contains(FString("Spine")) || BoneName.Contains(FString("Pelvis")))
+	else if (BoneName.Contains(FString("spine")) || BoneName.Contains(FString("pelvis")))
 	{ //torsoHit
 		
 		return 2;
 	}
-	else if (BoneName.Equals(FString("Neck")))
+	else if (BoneName.Equals(FString("neck_01")))
 	{ //Neck Hit
 		
 		return 3;
 	}
-	else if (BoneName.Equals(FString("Head")))
+	else if (BoneName.Equals(FString("head")))
 	{ //Head hit
 		
 		return 4;
@@ -191,27 +213,57 @@ void AZombieBase::Hit(ACharacterBase* Player,FHitResult HitResult)
 							case 4: HitLocation = EHitLocation::Head;  break;
 
 							}
-							float WeaponDamage = PlayerWeapon->GetWeaponDamage().GetDamage(HitLocation);
-							UE_LOG(LogTemp, Warning, TEXT("WeaponDamgage: %f"), WeaponDamage);
+							if (Player->upgraded == false)
+							{
+								
+								float WeaponDamage = PlayerWeapon->GetWeaponDamage().GetDamage(HitLocation);
+								UE_LOG(LogTemp, Warning, TEXT("WeaponDamgage: %f"), WeaponDamage);
 
-						if (uint8 PointsForHit = GetPointsForHit(HitPart, WeaponDamage))
+								if (uint8 PointsForHit = GetPointsForHit(HitPart, WeaponDamage))
+								{
+
+									PState->IncrementPoints(PointsForHit);
+									PState->IncrementXP(PointsForHit);
+								}
+							}
+							else
+							{
+								float WeaponDamage = PlayerWeapon->GetUpgradedWeaponDamage().GetDamage(HitLocation);
+								UE_LOG(LogTemp, Warning, TEXT("WeaponDamgage: %f"), WeaponDamage);
+
+								if (uint8 PointsForHit = GetPointsForHit(HitPart, WeaponDamage))
+								{
+
+									PState->IncrementPoints(PointsForHit);
+									PState->IncrementXP(PointsForHit);
+								}
+							}
+
+							if(AActor* Blood = GetWorld()->SpawnActor<AActor>(BloodBP, BloodLocation, FRotator::ZeroRotator))
+
+						if (HasAuthority())
 						{
 
-							PState->IncrementPoints(PointsForHit);
-							PState->IncrementXP(PointsForHit);
-						}
 
-						if (NS_Blood)
-						{
-							UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Blood, BloodLocation);
-						}
+							if (HitLocation == Torso && Health <= 40)
+							{
+								FVector Location(0.0f, 0.0f, 0.0f);
+								FRotator Rotation(0.0f, 0.0f, 0.0f);
+								FVector Scale(6.0f);
 
-						if (HitLocation != Torso && Health <= 50)
-						{
-							GetMesh()->HideBone(GetMesh()->GetBoneIndex(FName(BoneName)), PBO_None);
+								GetMesh()->SetSkinnedAssetAndUpdate(TorsoMesh, true);
+								UGameplayStatics* SpawnEmitter;
+								if(bIsDead == true)
+								SpawnEmitter->SpawnEmitterAttached(GibBlood, GetMesh(), "GIBS_HALF_LOWER", Location, Rotation, Scale, EAttachLocation::KeepRelativeOffset);
+
+							}
+							else if (HitLocation == Head && Health <= 40)
+							{
+								Multi_HeadEffect();
+							}
 						}
 						
-							
+						UGameplayStatics::PlaySound2D(this, SoundToPlay, 2.0f, 2.0f, 0.0f);
 						
 						
 

@@ -3,8 +3,10 @@
 
 #include "Zombies/Game/ZombiesGameState.h"
 #include <Net/UnrealNetwork.h>
+#include "Zombies/ZombieBase.h"
 #include <Player/ZombiesPlayerState.h>
 #include <Player/CharacterBase.h>
+#include <Kismet/GameplayStatics.h>
 
 AZombiesGameState::AZombiesGameState()
 {
@@ -13,6 +15,7 @@ AZombiesGameState::AZombiesGameState()
 	ZombiesOnMap = 0;
 	TotalZombiesRemaining = 5;
 	ZombieHealth = 150;
+	NewSpeed = 500.0f;
 	HasIncreased = false;
 }
 
@@ -26,6 +29,9 @@ void AZombiesGameState::IncrementRoundNumber()
 	++RoundNumber;
 	++HudNumber;
 	HasIncreased = true;
+
+	UGameplayStatics::PlaySound2D(this, SoundToPlay, 8.0f, 8.0f, 0.0f);
+
 	if (RoundNumber < 10)
 	{
 		ZombieHealth += 100;
@@ -33,6 +39,14 @@ void AZombiesGameState::IncrementRoundNumber()
 	else
 	{
 		ZombieHealth *= 1.1f;
+	}
+
+	if (RoundNumber >= 7)
+	{
+		
+		NewSpeed = 800.0f;
+
+		
 	}
 
 	
@@ -69,6 +83,11 @@ void AZombiesGameState::ZombieSpawned()
 float AZombiesGameState::GetZombieHealth()
 {
 	return ZombieHealth;
+}
+
+float AZombiesGameState::GetZombieSpeed()
+{
+	return NewSpeed;
 }
 
 bool AZombiesGameState::RoundHasIncreased()

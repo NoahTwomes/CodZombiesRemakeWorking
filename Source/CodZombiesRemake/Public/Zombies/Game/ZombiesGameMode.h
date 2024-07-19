@@ -29,6 +29,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 	int PlayersAlive;
 
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	USoundBase* SoundToPlay;
+
 
 	UPROPERTY(EditAnywhere, Category = "ZombiesSettings")
 	TSubclassOf<class ACharacterBase> PlayerClass;
